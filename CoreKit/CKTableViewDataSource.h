@@ -10,14 +10,24 @@
 #import <UIKit/UIKit.h>
 #import "CKManager.h"
 
+@protocol CKTableViewDelegate <NSObject>
+
+@optional
+- (void) dataSourceDidLoad;
+- (void) dataSourceWillLoad;
+
+@end
+
 @interface CKTableViewDataSource : NSObject <NSFetchedResultsControllerDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSEntityDescription *entityDescription;
 @property (nonatomic, assign) Class cellClass;
+@property (nonatomic, strong) id <CKTableViewDelegate> delegate;
 
 + (id) dataSourceForEntity:(NSString *) entity andTableView:(UITableView *) tableView;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath withObject:(id) object;
+- (NSInteger) count;
 
 @end

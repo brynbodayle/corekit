@@ -15,10 +15,10 @@
 #define ckSeedPath @"seeds/"
 
 /** Set a class prefix such as RS, RAX, etc.. Will be parsed out when necessary for remote operations and local file mapping */
-#define ckCoreDataClassPrefix @""
+#define ckCoreDataClassPrefix @"RS"
 
 /** Default date format used to parse strings to NSDate objects. */
-#define ckDateDefaultFormat @"yyyy-MM-dd'T'HH:mm:ssZZZ"
+#define ckDateDefaultFormat @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZ"
 
 /** Log level for debugging, 0 = None, 1 = Warnings, Errors, 2 = Errors */
 #define ckLogLevel 1 

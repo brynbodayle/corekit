@@ -77,26 +77,29 @@
 }
 
 - (void) setRelationship:(NSString *) key value:(id) value relationshipDescription:(NSRelationshipDescription *) relationshipDescription {
-    
+        
     id existingValue = [self valueForKey:key];
     
     Class relationshipClass = NSClassFromString([[relationshipDescription destinationEntity] managedObjectClassName]);
     id newValue = nil;
-    
+            
     if([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]])        
         newValue = [relationshipClass findById:[NSNumber numberWithInt:[value intValue]]];
     else{
         
         newValue = [relationshipClass build:value];
 
-        if([relationshipDescription isToMany])
-            newValue = [newValue isKindOfClass:[NSArray class]] ? [NSSet setWithArray:newValue] : [NSSet setWithArray:[NSArray arrayWithObject:newValue]];
-        else{
+        if(newValue != nil){
             
-            if([value isKindOfClass:[NSDictionary class]])
-                newValue = value;
-            else if ([value isKindOfClass:[NSArray class]] && [[value objectAtIndex:0] isKindOfClass:[NSDictionary class]])
-                newValue = [value objectAtIndex:0];
+            if([relationshipDescription isToMany])
+                newValue = [newValue isKindOfClass:[NSArray class]] ? [NSSet setWithArray:newValue] : [NSSet setWithArray:[NSArray arrayWithObject:newValue]];
+            else{
+                
+                if([value isKindOfClass:[NSDictionary class]])
+                    newValue = value;
+                else if ([value isKindOfClass:[NSArray class]] && [[value objectAtIndex:0] isKindOfClass:[NSDictionary class]])
+                    newValue = [value objectAtIndex:0];
+            }
         }
     }
     

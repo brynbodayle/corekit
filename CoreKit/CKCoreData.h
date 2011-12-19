@@ -21,5 +21,6 @@
 - (NSDictionary *) persistentStoreOptions;
 - (BOOL) save;
 - (NSString *) applicationDocumentsDirectory;
+- (void) setupModels;
 
 @end

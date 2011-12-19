@@ -11,7 +11,7 @@
 #import "CKResult.h"
 #import "CKSupport.h"
 
-@class CKSearch;
+@class CKSearch, CKRecord;
 
 /** Options used for default settings */ 
 typedef enum CKRecordOptions {
@@ -21,7 +21,16 @@ typedef enum CKRecordOptions {
     CKRecordOptionsConvertCamelCase
 } CKRecordOptions;
 
-@interface CKRecord : NSManagedObject
+
+@protocol CKRecordDelegate <NSObject>
+
+@optional
+- (void) didInsertRecord:(CKRecord *) record withData:(NSDictionary *) data;
+- (void) didUpdateRecord:(CKRecord *) record withData:(NSDictionary *) data;
+
+@end
+
+@interface CKRecord : NSManagedObject <CKRecordDelegate>
 
 
 /** @name Entity Methods */
@@ -29,6 +38,10 @@ typedef enum CKRecordOptions {
 /** Cached property list */
 @property (nonatomic, readonly, strong) NSDictionary *attributes;
 
+@property(nonatomic, strong) id <CKRecordDelegate> delegate;
+
+/** Any model settings can be established here, these are invoked once per session */
++ (void) setup;
 /** Return the name of the model */
 + (NSString *) entityName;
 /** Return the name of the model and optionally remove the class prefix (if there is one) 
@@ -124,6 +137,7 @@ typedef enum CKRecordOptions {
 - (CKRequest *) requestForRemoveRemotely;
 
 - (id) serialize;
+- (NSMutableDictionary *) serializedValue;
 
 
 /** @name Counting */
@@ -183,7 +197,7 @@ typedef enum CKRecordOptions {
 /** Find a record by a specified ID
  @param itemId the ID of the object
  */
-+ (id) findById:(NSNumber *) itemId;
++ (id) findById:(id) itemId;
 
 /** @name Aggregates */
 /** Average the specified attribute 
@@ -256,5 +270,7 @@ typedef enum CKRecordOptions {
 
 /** Primary key field name */
 + (NSString *) primaryKeyName;
+
++ (NSString *) baseURL;
 
 @end

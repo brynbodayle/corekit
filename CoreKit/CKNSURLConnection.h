@@ -19,5 +19,6 @@
 @property (nonatomic, strong) NSDictionary *responseHeaders;
 
 - (BOOL) connectionVerified;
+- (void) printDebug:(CKResult *) result;
 
 @end

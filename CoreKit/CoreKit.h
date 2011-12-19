@@ -17,3 +17,5 @@
 #import "CKSerialization.h"
 #import "CKRequest.h"
 #import "CKResult.h"
+#import "CKBindings.h"
+#import "CKRecord+CKBindings.h"

@@ -21,6 +21,8 @@
 @synthesize connection = _connection;
 @synthesize responseHeaders = _responseHeaders;
 
+#define LOG_DEBUG YES
+
 - (id) init{
     
     self = [super init];
@@ -30,6 +32,12 @@
     }
     
     return self;
+}
+
+- (void) printDebug:(CKResult *) result{
+    
+    if(LOG_DEBUG)
+        NSLog(@"%@ %i %@", [_request methodString], _responseCode, [_request remoteURL]);
 }
 
 -(BOOL) connectionVerified{
@@ -70,13 +78,17 @@
     
 	if(![self connectionVerified])
 		return [CKResult resultWithRequest:request andResponseBody:nil];	
-        
+    
 	NSData *response = [NSURLConnection sendSynchronousRequest:[_request remoteRequest] returningResponse:&httpResponse error:&error];
     
 	_responseCode = [httpResponse statusCode];
     self.responseHeaders = [httpResponse allHeaderFields];
     
-	return [[CKResult alloc] initWithRequest:_request responseBody:response httpResponse:httpResponse error:&error];
+	CKResult *result = [[CKResult alloc] initWithRequest:_request responseBody:response httpResponse:httpResponse error:&error];
+    
+    [self printDebug:result];
+    
+    return result;
 }
 
 - (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response{
@@ -110,9 +122,11 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	
 	CKResult *result = [CKResult resultWithRequest:_request andError:&error];
-    	
+    
 	if(_request.errorBlock != nil)
         _request.errorBlock(result);
+    
+    [self printDebug:result];
 }
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection{
@@ -126,8 +140,12 @@
         result.responseCode = _responseCode;
         result.responseHeaders = _responseHeaders;
         
+        [self printDebug:result];
+        
         _request.completionBlock(result);	
     }
+    else
+        [self printDebug:nil];
 }
 
 @end

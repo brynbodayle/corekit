@@ -42,6 +42,7 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize errorBlock = _errorBlock;
 @synthesize parseBlock = _parseBlock;
+@synthesize baseURL=_baseURL;
 
 - (id) initWithRouterMap:(CKRouterMap *) map{
 
@@ -89,6 +90,18 @@
     NSString *password = [_password length] > 0 ? _password : [CKManager sharedManager].httpPassword;
     
     return [NSURLCredential credentialWithUser:user password:password persistence:NSURLCredentialPersistenceNone];
+}
+
+- (void) setBody:(id)body{
+    
+    if(![body isKindOfClass:[NSData class]]){
+        
+        _body = [[CKManager sharedManager] serialize:body];
+    }
+    else{
+        
+        _body = body;
+    }
 }
 
 - (void) addHeaders:(NSDictionary *) data{
@@ -139,31 +152,34 @@
 - (NSURL *) remoteURL{
     
     NSMutableString *url = [_remotePath mutableCopy];
-    NSMutableString *baseURL = [[CKManager sharedManager].baseURL mutableCopy];
+    NSMutableString *baseURL = [self.baseURL length] > 0 ? [self.baseURL mutableCopy] : [[CKManager sharedManager].baseURL mutableCopy];
     
-    if([baseURL length] == 0){
+    if([url rangeOfString:@"http"].location == NSNotFound){
         
-        return [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:4]];
+        if([baseURL length] == 0){
+            
+            return [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:4]];
+        }
+        
+        if([baseURL length] > 0 && [url length] > 0){
+            
+            [url replaceOccurrencesOfString:baseURL withString:@"" options:0 range:NSMakeRange(0, [url length])];
+            [url replaceOccurrencesOfString:@"//" withString:@"/" options:0 range:NSMakeRange(0, [url length])];
+        }
+        
+        BOOL baseURLContainsTrailingSlash = [baseURL length] > 0 ? [[baseURL substringWithRange:NSMakeRange([baseURL length] - 1, 1)] isEqualToString:@"/"] : YES;
+        
+        if([[url substringToIndex:1] isEqualToString:@"/"] && baseURLContainsTrailingSlash)
+            [url replaceCharactersInRange:NSMakeRange(0, 1) withString:@""];
+        else if(!baseURLContainsTrailingSlash)
+            [baseURL appendString:@"/"];
+        
+        if([baseURL rangeOfString:@"http"].location == NSNotFound)
+            [baseURL insertString: self.secure || [CKManager sharedManager].secureAllConnections ? @"https://" : @"http://" atIndex:0];
+        
+        if([baseURL length] > 0)
+            [url insertString:baseURL atIndex:0];
     }
-
-    if([baseURL length] > 0 && [url length] > 0){
-        
-        [url replaceOccurrencesOfString:baseURL withString:@"" options:0 range:NSMakeRange(0, [url length])];
-        [url replaceOccurrencesOfString:@"//" withString:@"/" options:0 range:NSMakeRange(0, [url length])];
-    }
-        
-    BOOL baseURLContainsTrailingSlash = [baseURL length] > 0 ? [[baseURL substringWithRange:NSMakeRange([baseURL length] - 1, 1)] isEqualToString:@"/"] : YES;
-    
-    if([[url substringToIndex:1] isEqualToString:@"/"] && baseURLContainsTrailingSlash)
-        [url replaceCharactersInRange:NSMakeRange(0, 1) withString:@""];
-    else if(!baseURLContainsTrailingSlash)
-        [baseURL appendString:@"/"];
-    
-    if([baseURL rangeOfString:@"http"].location == NSNotFound)
-        [baseURL insertString: self.secure || [CKManager sharedManager].secureAllConnections ? @"https://" : @"http://" atIndex:0];
-    
-    if([baseURL length] > 0)
-        [url insertString:baseURL atIndex:0];
     
     if(_batch || _isBatched || [CKManager sharedManager].batchAllRequests){
         

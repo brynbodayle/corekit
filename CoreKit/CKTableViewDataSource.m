@@ -14,12 +14,14 @@
 @synthesize tableView = _tableView;
 @synthesize entityDescription = _entityDescription;
 @synthesize cellClass = _cellClass;
+@synthesize delegate = _delegate;
 
 + (id) dataSourceForEntity:(NSString *) entity andTableView:(UITableView *) tableView{
     
     CKTableViewDataSource *dataSource = [[[self class] alloc] init];
 
     dataSource.tableView = tableView;
+    tableView.dataSource = dataSource;
     
     Class model = NSClassFromString(entity);
     dataSource.entityDescription = [model entityDescription];
@@ -64,6 +66,11 @@
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
     
     [self.tableView beginUpdates];
+    
+    if(self.delegate != nil && [self.delegate respondsToSelector:@selector(dataSourceWillLoad)]){
+        
+        [self.delegate performSelector:@selector(dataSourceWillLoad)];
+    }
 }
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
@@ -106,6 +113,11 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
     
     [self.tableView endUpdates];
+    
+    if(self.delegate != nil && [self.delegate respondsToSelector:@selector(dataSourceDidLoad)]){
+        
+        [self.delegate performSelector:@selector(dataSourceDidLoad)];
+    }
 }
 
 - (NSFetchedResultsController *) fetchedResultsController {
@@ -133,7 +145,17 @@
 	    abort();
 	}
     
+    if([_fetchedResultsController.fetchedObjects count] == 0 && self.delegate != nil && [self.delegate respondsToSelector:@selector(dataSourceDidLoad)]){
+        
+        [self.delegate performSelector:@selector(dataSourceDidLoad)];
+    }
+    
     return _fetchedResultsController;
+}
+
+- (NSInteger) count{
+    
+    return [_fetchedResultsController.fetchedObjects count];
 }
 
 @end

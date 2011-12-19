@@ -16,8 +16,8 @@
     
     id value = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
 
-    if(value == nil)
-        NSLog(@"%@", error);
+    //if(value == nil)
+    //NSLog(@"%@", error);
     
     return value;
 }

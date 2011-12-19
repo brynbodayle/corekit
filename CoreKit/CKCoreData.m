@@ -30,9 +30,25 @@
         self.managedObjectContext = [self newManagedObjectContext];
         self.managedObjectModel = [self managedObjectModel];
 		self.persistentStoreCoordinator = [self persistentStoreCoordinator];
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            
+            [self setupModels];
+        });
     }
     
     return self;
+}
+
+- (void) setupModels{
+    
+    NSDictionary *models = [self.managedObjectModel entitiesByName];
+    
+    for(NSString *model in [models allKeys]){
+        
+        Class record = NSClassFromString(model);
+        [record setup];
+    }
 }
 
 - (NSManagedObjectContext *) managedObjectContext{
@@ -59,7 +75,7 @@
 	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 	[moc setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 	[moc setUndoManager:nil];
-	[moc setMergePolicy:NSOverwriteMergePolicy];
+	[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChanges:) name:NSManagedObjectContextDidSaveNotification object:moc];
     
@@ -75,12 +91,12 @@
         
         NSArray *files = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"momd" subdirectory:@"."];
         
-        _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[files objectAtIndex:0]];
+        if([files count] > 0)
+            _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[files objectAtIndex:0]];
     }
-    else{
         
+    if(_managedObjectModel == nil)
         _managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:[NSArray arrayWithObject:[NSBundle bundleForClass:[self class]]]];
-    }
     
     
 	return _managedObjectModel;

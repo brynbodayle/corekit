@@ -57,18 +57,23 @@
             NSString *keyPath = [_remotePath substringWithRange:[result rangeAtIndex:1]];
                         
             id value = [_object valueForKeyPath:keyPath];
+            NSRange characterRange = [path rangeOfString:[_remotePath substringWithRange:result.range]];
             
             if(value != nil){
                 
                 if(![value isKindOfClass:[NSString class]])
                     value = [value stringValue];
                 
-                [path replaceCharactersInRange:[path rangeOfString:[_remotePath substringWithRange:result.range]] withString:value];
+                [path replaceCharactersInRange:characterRange withString:value];
+            }
+            else{
+                
+                [path deleteCharactersInRange:characterRange];
             }
         }];
     }
     
-    return [path lowercaseString];
+    return path;
 }
 
 - (BOOL) isAttributeMap{

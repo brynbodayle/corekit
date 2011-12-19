@@ -78,6 +78,7 @@ typedef enum CKRequestInterval {
 @property (nonatomic, copy) CKResultBlock completionBlock;
 @property (nonatomic, copy) CKResultBlock errorBlock;
 @property (nonatomic, copy) CKParseBlock parseBlock;
+@property (nonatomic, strong) NSString *baseURL;
 
 + (CKRequest *) request;
 + (CKRequest *) requestWithRemotePath:(NSString *) remotePath;

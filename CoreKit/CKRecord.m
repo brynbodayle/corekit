@@ -14,10 +14,11 @@
 #import "CKRecordPrivate.h"
 #import "CKResult.h"
 #import "CKRecord+CKRouter.h"
+#import "CKRequest.h"
 
 @implementation CKRecord
 
-@synthesize attributes = _attributes;
+@synthesize attributes = _attributes,delegate=_delegate;
 
 - (id) initWithEntity:(NSEntityDescription *)entity insertIntoManagedObjectContext:(NSManagedObjectContext *)context{
     
@@ -32,6 +33,10 @@
 
 #pragma mark -
 #pragma mark Entity Methods
+
++ (void) setup{
+    
+}
 
 + (NSString *) entityName {
 	
@@ -50,7 +55,7 @@
 
 + (NSEntityDescription *) entityDescription{
 	
-	return [NSEntityDescription entityForName:[self entityNameWithPrefix:NO] inManagedObjectContext:[self managedObjectContext]];
+	return [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self managedObjectContext]];
 }
 
 + (NSFetchRequest *) fetchRequest{
@@ -106,16 +111,19 @@
     
     else if ([data isKindOfClass:[NSDictionary class]]) {
         
-        id resourceId = [data objectForKey:[self primaryKeyName]];
-        
-		if (resourceId != nil){
-			
-			id resource = [self findById:[NSNumber numberWithInt:[resourceId intValue]]];
+        if([[data allKeys] containsObject:[self primaryKeyName]]){
             
-            returnValue = resource == nil ? [self create:data] : [[resource threadedSafeSelf] update:data];
-		}
-		else
-			returnValue = [self create:data];
+            id resourceId = [data objectForKey:[self primaryKeyName]];
+            
+            if (resourceId != nil){
+                
+                id resource = [self findById:resourceId];
+                
+                returnValue = resource == nil ? [self create:data] : [[resource threadedSafeSelf] update:data];
+            }
+            else
+                returnValue = [self create:data];
+        }
     }
         
     return returnValue;
@@ -139,14 +147,14 @@
                 [returnValue addObject:newValue]; 
         }];
     }
-    
+        
     return returnValue;
 }
 
 - (id) update:(NSDictionary *) data{
         
     CKRecord *safe = [self threadedSafeSelf];
-    
+        
     [data enumerateKeysAndObjectsWithOptions:0 usingBlock:^(id key, id obj, BOOL *stop){
         
         NSDictionary *propertyMap = [[safe class] attributeMap];
@@ -165,6 +173,13 @@
             }
         }
     }];
+        
+    if(![self isInserted]){
+        
+        [self didInsertRecord:self withData:data];
+    }
+    
+    [self didUpdateRecord:self withData:data];
     
     NSError *error = nil;
     if(![safe validateForUpdate:&error]){
@@ -208,8 +223,8 @@
 
 - (void) removeLocallyAndRemotely{
     
-    [self remove];
     [self removeRemotely:nil errorBlock:nil];
+    [self remove];
 }
 
 #pragma mark -
@@ -226,7 +241,10 @@
 
 + (CKRequest *) requestForGet{
     
-    return [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodGET]];
+    CKRequest *request = [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodGET]];
+    request.baseURL = [self baseURL];
+    
+    return request;
 }
 
 - (void) post:(CKParseBlock) parseBlock completionBlock:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock{
@@ -238,6 +256,7 @@
     
     CKRequest *request = [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodPOST]];
     request.body = [self serialize];
+    request.baseURL = [[self class] baseURL];
     
     return request;    
 }
@@ -251,6 +270,7 @@
     
     CKRequest *request = [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodPUT]];
     request.body = [self serialize];
+    request.baseURL = [[self class] baseURL];
     
     return request;
 }
@@ -262,7 +282,10 @@
 
 - (CKRequest *) requestForGet{
     
-    return [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodGET]];
+    CKRequest *request = [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodGET]];
+    request.baseURL = [[self class] baseURL];
+    
+    return request;
 }
 
 - (void) removeRemotely:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock{
@@ -272,7 +295,10 @@
 
 - (CKRequest *) requestForRemoveRemotely{
     
-    return [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodDELETE]];
+    CKRequest *request = [CKRequest requestWithMap:[self mapForRequestMethod:CKRequestMethodDELETE]];
+    request.baseURL = [[self class] baseURL];
+    
+    return request;
 }
 
 - (void) sync{
@@ -300,15 +326,64 @@
     
     if(request.errorBlock == nil)
         request.errorBlock = errorBlock;    
+    
+    [request send];
 }
 
 
 - (id) serialize{
-    
-    return [[CKManager sharedManager] serialize:self];
+        
+    return [[CKManager sharedManager] serialize:[self serializedValue]];
 }
 
+- (NSMutableDictionary *) serializedValue{
+	
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    
+    for (NSPropertyDescription *prop in [[[self class] entityDescription] properties]) {
+        
+        NSString *key = prop.name;
+        
+        //if ((only == nil || [only containsObject:key]) && (except == nil || ![except containsObject:key])) {
+            id value = [self valueForKey:key];
+        
+            if (value == nil)
+                value = [NSNull null];
+            
+            // For attributes, simply set the value
+            if ([prop isKindOfClass:[NSAttributeDescription class]]) {
+                // Serialize dates if serializeDates is set
+                if ([value isKindOfClass:[NSDate class]])
+                    value = [[self dateFormatter] stringFromDate:value];
+                
+                [dict setObject:value forKey:key];
+            }
+			
+            else{
+                
+                NSRelationshipDescription *rel = (NSRelationshipDescription *)prop;
+                
+                if ([rel isToMany]) {
+                    
+                    NSSet *relResources = value;
+                    NSMutableArray *relArray = [NSMutableArray arrayWithCapacity:[relResources count]];
+                    
+                    for (CKRecord *resource in relResources) {
 
+                        [relArray addObject:[resource serializedValue]];
+                    }
+                    [dict setObject:relArray forKey:key];
+                }
+                else {
+                    
+                    [dict setObject:value forKey:key];
+                }
+            }
+        //}
+    }
+    
+    return dict;
+}
 
 #pragma mark -
 #pragma mark Counting
@@ -389,9 +464,9 @@
     return [self findWithPredicate:[NSPredicate predicateWithFormat:@"%K == %@", attribute, value]];
 }
 
-+ (id) findById:(NSNumber *) itemId{
++ (id) findById:(id) itemId{
         
-    NSArray *results = [self findWithPredicate:[NSPredicate predicateWithFormat:@"%K == %i", [self primaryKeyName], [itemId intValue]] sortedBy:nil withLimit:1];
+    NSArray *results = [self findWithPredicate:[NSPredicate predicateWithFormat:@"%K == %@", [self primaryKeyName], itemId] sortedBy:nil withLimit:1];
     
     return [results count] > 0 ? [results objectAtIndex:0] : nil;
 }
@@ -554,5 +629,20 @@
     return @"id";
 }
 
++ (NSString *) baseURL{
+    
+    return [[CKManager sharedManager] baseURL];
+}
+
+#pragma mark -
+#pragma mark Delegate
+- (void) didInsertRecord:(CKRecord *) record withData:(NSDictionary *) data{
+    
+}
+
+
+- (void) didUpdateRecord:(CKRecord *) record withData:(NSDictionary *) data{
+    
+}
 
 @end

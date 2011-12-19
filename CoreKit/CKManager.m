@@ -43,7 +43,7 @@
     dispatch_once(&predicate, ^{
         _shared = [[self alloc] init];
     });
-    
+
     return _shared;
 }
 
@@ -162,7 +162,7 @@
             
             pagesComplete++;
             
-            if(pagesComplete == request.batchMaxPages){
+            if(pagesComplete == request.batchMaxPages || [result.objects count] == 0){
                 
                 result.objects = objects;
                 

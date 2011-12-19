@@ -73,7 +73,7 @@
         map.requestMethod = method;
         
         NSString *resourceName = [[self entityNameWithPrefix:NO] pluralForm];
-        map.remotePath = resourceName;
+        map.remotePath = $S(@"%@/%@", [self baseURL], resourceName);
     }
     
     return map;
@@ -85,15 +85,24 @@
 
     if(map == nil){
         
+        CKRouterMap *classMap = [[CKRouter sharedRouter] mapForModel:[self class] forRequestMethod:method];
+        
         map = [CKRouterMap map];
         map.model = [self class];
-        map.requestMethod = method;
         map.isInstanceMap = YES;
         
-        NSString *resourceName = [[[self class] entityNameWithPrefix:NO] pluralForm];
-        map.remotePath = [NSString stringWithFormat:@"%@/(%@)", resourceName, [[self class] primaryKeyName]];
+        if(classMap == nil){
+            
+            NSString *resourceName = [[[self class] entityNameWithPrefix:NO] pluralForm];
+            map.remotePath = [NSString stringWithFormat:@"%@/%@/(%@)", [[self class] baseURL], resourceName, [[self class] primaryKeyName]];
+        }
+        else{
+            
+            map.remotePath = $S(@"%@/(%@)", classMap.remotePath, [[self class] primaryKeyName]);
+        }
     }
     
+    map.requestMethod = method;
     map.object = self;
     
     return map;

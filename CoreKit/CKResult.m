@@ -70,12 +70,15 @@
 - (void) setResponseBody:(NSData *)responseBody{
     
     _responseBody = responseBody;
-    
+
     if (responseBody != nil && [responseBody length] > 0){
         
          Class model = _request.routerMap.model;
         
         id parsed = [[CKManager sharedManager] parse:responseBody];
+        
+        if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
+            return;
         
         NSString *pluralEntityName = [[[model entityNameWithPrefix:NO] lowercaseString] pluralForm];
                 
@@ -85,11 +88,14 @@
             parsed = [parsed objectForKey:pluralEntityName];
         
         id builtObjects;
-        
+                   
         if(model != nil && parsed != nil)        
             builtObjects = [model build:parsed];
-        
-        self.objects = [builtObjects isKindOfClass:[NSArray class]] ? builtObjects : [NSArray arrayWithObject:builtObjects];
+                
+        if(builtObjects != nil)
+            self.objects = [builtObjects isKindOfClass:[NSArray class]] ? builtObjects : [NSArray arrayWithObject:builtObjects];
+        else if(parsed != nil)
+            self.objects = [parsed isKindOfClass:[NSArray class]] ? parsed : [NSArray arrayWithObject:parsed];
         
         [CKRecord save];
     }
@@ -100,6 +106,13 @@
 - (NSUInteger) countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len{
     
     return [_objects countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+- (NSString *) stringResponseBody{
+    
+    NSString *string = [[NSString alloc] initWithData:_responseBody encoding:NSUTF8StringEncoding];
+    
+    return string;
 }
 
 
