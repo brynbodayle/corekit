@@ -15,15 +15,6 @@
 
 @implementation CKBindingMap
 
-@synthesize objectID = _objectID;
-@synthesize entityClass = _entityClass;
-@synthesize control = _control;
-@synthesize target = _target;
-@synthesize changeType = _changeType;
-@synthesize block = _block;
-@synthesize selector = _selector;
-@synthesize keyPath = _keyPath;
-
 + (CKBindingMap *) map{
     
     return [[CKBindingMap alloc] init];
@@ -37,7 +28,7 @@
 
 - (CKRecord *) object{
     
-    return (CKRecord *) [[CKManager sharedManager].managedObjectContext objectWithID:_objectID];
+    return (CKRecord *) [[CKManager sharedManager].managedObjectContext existingObjectWithID:_objectID error:nil];
 }
 
 - (void) fire{

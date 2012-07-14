@@ -29,6 +29,7 @@
         
         self.remotePath = remotePath;
         self.responseKeyPath = [CKManager sharedManager].responseKeyPath;
+        self.errorKeyPath = [CKManager sharedManager].errorKeyPath;
     }
     
     return self;

@@ -13,6 +13,7 @@
 #import "CKRouterMap.h"
 #import "NSDictionary+NSDictionary_KeyPath.h"
 #import "NSString+InflectionSupport.h"
+#import "CKRecordPrivate.h"
 
 @implementation CKResult
 
@@ -64,43 +65,122 @@
 
 - (id) object{
 	
-	return _objects != nil && [_objects count] > 0 ? [_objects objectAtIndex:0] : nil;
+	return _objects != nil && [_objects count] > 0 ? _objects[0] : nil;
 }
 
 - (void) setResponseBody:(NSData *)responseBody{
     
     _responseBody = responseBody;
+        
+    __block NSManagedObjectContext *currentThreadContext = [CKManager sharedManager].coreData.managedObjectContext;
 
-    if (responseBody != nil && [responseBody length] > 0){
-        
-         Class model = _request.routerMap.model;
-        
-        id parsed = [[CKManager sharedManager] parse:responseBody];
-        
-        if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
-            return;
-        
-        NSString *pluralEntityName = [[[model entityNameWithPrefix:NO] lowercaseString] pluralForm];
+    [currentThreadContext performBlockAndWait:^{
+    
+        if (responseBody != nil && [responseBody length] > 0){
+            
+            NSMutableArray *parts = [NSMutableArray arrayWithArray:[_request.remotePath componentsSeparatedByString:@"/"]];
+            if([[parts lastObject] intValue] > 0)
+                [parts removeLastObject];
+            
+            NSString *pathEntity = [parts lastObject];
+            
+            NSString *entityName = [[pathEntity singularForm] lowercaseString];
+            NSString *pluralEntityName = [pathEntity lowercaseString];
+                        
+            Class model = _request.routerMap.model;
+                    
+            if(_request.routerMap.isRelationshipMap){
                 
-        if([_request.routerMap.responseKeyPath length] > 0 && [parsed isKindOfClass:[NSDictionary class]])        
-            parsed = [parsed objectForKeyPath:_request.routerMap.responseKeyPath];
-        else if ([parsed isKindOfClass:[NSDictionary class]] && [[parsed allKeys] containsObject:pluralEntityName])
-            parsed = [parsed objectForKey:pluralEntityName];
-        
-        id builtObjects;
-                   
-        if(model != nil && parsed != nil)        
-            builtObjects = [model build:parsed];
+                NSEntityDescription *entity = [_request.routerMap.model entityDescription];
                 
-        if(builtObjects != nil)
-            self.objects = [builtObjects isKindOfClass:[NSArray class]] ? builtObjects : [NSArray arrayWithObject:builtObjects];
-        else if(parsed != nil)
-            self.objects = [parsed isKindOfClass:[NSArray class]] ? parsed : [NSArray arrayWithObject:parsed];
+                if(entity){
+                    
+                    NSRelationshipDescription *relationship = [entity relationshipsByName][_request.routerMap.localAttribute];
+                    model = NSClassFromString(relationship.destinationEntity.managedObjectClassName);
+                }
+            }
+                    
+            id parsed = [[CKManager sharedManager] deserialize:responseBody];
+            //NSLog(@"**** PARSED \n %@", parsed);
+            
+            if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
+                return;
+           
+            
+            id finalData;
+                    
+            //        NSLog(@"%@ - %@", entityName, pluralEntityName);
+            
+            if([parsed isKindOfClass:[NSDictionary class]]){
+             
+                if([_request.routerMap.responseKeyPath length] > 0)
+                    finalData = [parsed objectForKeyPath:_request.routerMap.responseKeyPath];
+                else if ([[parsed allKeys] containsObject:pluralEntityName])
+                    finalData = parsed[pluralEntityName];
+                else if ([[parsed allKeys] containsObject:entityName])
+                    finalData = parsed[entityName];
+                else
+                    finalData = parsed;
+            }
+            else{
+                
+                finalData = parsed;
+            }
+            
+            //        NSLog(@"**** FINAL DATA \n %@", finalData);
+            
+            NSMutableArray *builtObjects = [NSMutableArray array];
+                       
+            if(finalData != nil && [finalData isKindOfClass:[NSArray class]]){
+                
+                for(id obj in finalData){
+                    
+                    [builtObjects addObject:[model build:obj]];
+                }
+            }
+            else if(parsed != nil && finalData != nil && [parsed isKindOfClass:[NSDictionary class]] && [finalData isKindOfClass:[NSDictionary class]] && ![parsed isEqualToDictionary:finalData]){
+                
+                [builtObjects addObject:[model build:finalData]];
+            }
+            else{
+                [builtObjects addObject:finalData];
+            }
+            
+            //        NSLog(@"**** BUILT OBJECTS \n %@", builtObjects);
+                    
+            if(builtObjects > 0){
+                
+                self.objects = builtObjects;
+            }
+            else if(finalData != nil)
+                self.objects = [finalData isKindOfClass:[NSArray class]] ? finalData : @[finalData];
+            
+            //[currentThreadContext.parentContext save:nil];
+            
+            id errorHash = [parsed objectForKeyPath:_request.routerMap.errorKeyPath];
+            NSLog(@"%@", errorHash);
+            if(errorHash != nil && [errorHash isKindOfClass:[NSDictionary class]]){
+                
+                //self.error = [NSError errorWithDomain:@"com.corekit" code:_responseCode userInfo:@{ NSLocalizedDescriptionKey : errorHash }];
+                
+                if(_request.errorBlock != nil){
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                        //_request.errorBlock(self);
+                    });
+                }
+            }
+        }
+        else
+            self.objects = @[];
         
-        [CKRecord save];
-    }
-    else
-        self.objects = [NSArray array];
+    }];
+}
+
+- (BOOL) isError{
+    
+    return self.error != nil;
 }
 
 - (NSUInteger) countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len{
@@ -113,6 +193,25 @@
     NSString *string = [[NSString alloc] initWithData:_responseBody encoding:NSUTF8StringEncoding];
     
     return string;
+}
+
+- (NSArray *) resultsForQueue:(dispatch_queue_t) queue{
+    
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity:[self.objects count]];
+    
+    dispatch_sync(queue, ^{
+        
+        for(id object in self.objects){
+            
+            if([object isKindOfClass:[NSManagedObject class]]){
+                
+                id obj = [[CKManager sharedManager].coreData objectWithURI:[[object objectID] URIRepresentation]];
+                [results addObject:obj];
+            }
+        }
+    });
+    
+    return results;
 }
 
 

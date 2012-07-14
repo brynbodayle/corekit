@@ -27,6 +27,8 @@
 - (id) initWithRequest:(CKRequest *) request responseBody:(NSData *) responseBody httpResponse:(NSHTTPURLResponse *) httpResponse error:(NSError **) error; 
 - (id) initWithObjects:(NSArray *) objects; 
 - (id) object;
+- (BOOL) isError;
 - (NSString *) stringResponseBody;
+- (NSArray *) resultsForQueue:(dispatch_queue_t) queue;
 
 @end

@@ -14,7 +14,7 @@
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-- (NSManagedObjectContext*) newManagedObjectContext;
+- (NSManagedObjectContext*) newManagedObjectContext:(NSManagedObjectContextConcurrencyType) concurrencyType;
 - (NSString *) storePath;
 - (NSURL *) storeURL;
 - (NSString *) persistentStoreType;
@@ -22,5 +22,6 @@
 - (BOOL) save;
 - (NSString *) applicationDocumentsDirectory;
 - (void) setupModels;
+- (NSManagedObject *)objectWithURI:(NSURL *)uri;
 
 @end

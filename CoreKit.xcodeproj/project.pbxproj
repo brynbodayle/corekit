@@ -6,6 +6,21 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		C96557C114EDD26E00032284 /* Framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = C96557C214EDD26E00032284 /* Build configuration list for PBXAggregateTarget "Framework" */;
+			buildPhases = (
+				C96557C714EDD28900032284 /* Prepare Framework */,
+			);
+			dependencies = (
+				C96557C614EDD27A00032284 /* PBXTargetDependency */,
+			);
+			name = Framework;
+			productName = Framework;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		C9030A2F13D60A630024AE31 /* CKRecordTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C9030A2E13D60A630024AE31 /* CKRecordTests.m */; };
 		C9030A3B13D624A10024AE31 /* fixtures in Resources */ = {isa = PBXBuildFile; fileRef = C9030A3A13D624A10024AE31 /* fixtures */; };
@@ -17,69 +32,79 @@
 		C91F9D3414042A2500C42219 /* CoreSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = C91F9D3314042A2500C42219 /* CoreSupport.m */; };
 		C92BA7CE13F4297800EF4BAE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C92BA7CD13F4297800EF4BAE /* SystemConfiguration.framework */; };
 		C92BA7D613F47B9100EF4BAE /* CKNSURLConnectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C92BA7D513F47B9100EF4BAE /* CKNSURLConnectionTests.m */; };
-		C9377D7213D4CD370062C015 /* CKRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7013D4CD370062C015 /* CKRequest.h */; };
+		C9377D7213D4CD370062C015 /* CKRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7013D4CD370062C015 /* CKRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9377D7313D4CD370062C015 /* CKRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C9377D7113D4CD370062C015 /* CKRequest.m */; };
-		C9377D7713D4CD420062C015 /* CKRouter.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7513D4CD420062C015 /* CKRouter.h */; };
+		C9377D7713D4CD420062C015 /* CKRouter.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7513D4CD420062C015 /* CKRouter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9377D7813D4CD420062C015 /* CKRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9377D7613D4CD420062C015 /* CKRouter.m */; };
-		C9377D7C13D4CD530062C015 /* CKResult.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7A13D4CD530062C015 /* CKResult.h */; };
+		C9377D7C13D4CD530062C015 /* CKResult.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7A13D4CD530062C015 /* CKResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9377D7D13D4CD530062C015 /* CKResult.m in Sources */ = {isa = PBXBuildFile; fileRef = C9377D7B13D4CD530062C015 /* CKResult.m */; };
-		C9377D8113D4DA4B0062C015 /* CKNSJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7F13D4DA4B0062C015 /* CKNSJSONSerialization.h */; };
+		C9377D8113D4DA4B0062C015 /* CKNSJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = C9377D7F13D4DA4B0062C015 /* CKNSJSONSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9377D8213D4DA4B0062C015 /* CKNSJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C9377D8013D4DA4B0062C015 /* CKNSJSONSerialization.m */; };
 		C94FC37713E8877A002DFD92 /* Order.m in Sources */ = {isa = PBXBuildFile; fileRef = C9030A3213D60D610024AE31 /* Order.m */; };
 		C94FC37813E8877A002DFD92 /* OrderItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C9030A3413D60D610024AE31 /* OrderItem.m */; };
 		C95D787613CF481F005C3C29 /* CKManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C95D787513CF481F005C3C29 /* CKManagerTests.m */; };
-		C95D787A13CF4D0A005C3C29 /* CKManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C95D787813CF4D0A005C3C29 /* CKManager.h */; };
+		C95D787A13CF4D0A005C3C29 /* CKManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C95D787813CF4D0A005C3C29 /* CKManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C95D787B13CF4D0A005C3C29 /* CKManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C95D787913CF4D0A005C3C29 /* CKManager.m */; };
 		C95D789613CF90B6005C3C29 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C95D789513CF90B6005C3C29 /* CoreData.framework */; };
 		C95D789713CF92D0005C3C29 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C95D789513CF90B6005C3C29 /* CoreData.framework */; };
-		C95D78A113D08ADF005C3C29 /* CKCoreData.h in Headers */ = {isa = PBXBuildFile; fileRef = C95D789F13D08ADF005C3C29 /* CKCoreData.h */; };
+		C95D78A113D08ADF005C3C29 /* CKCoreData.h in Headers */ = {isa = PBXBuildFile; fileRef = C95D789F13D08ADF005C3C29 /* CKCoreData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C95D78A213D08ADF005C3C29 /* CKCoreData.m in Sources */ = {isa = PBXBuildFile; fileRef = C95D78A013D08ADF005C3C29 /* CKCoreData.m */; };
-		C96C15CF13D5E91800A78055 /* CKRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = C96C15CD13D5E91700A78055 /* CKRecord.h */; };
+		C96557BF14EDD15F00032284 /* CoreSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = C91F9D3214042A2500C42219 /* CoreSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C96C15CF13D5E91800A78055 /* CKRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = C96C15CD13D5E91700A78055 /* CKRecord.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C96C15D013D5E91800A78055 /* CKRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = C96C15CE13D5E91800A78055 /* CKRecord.m */; };
 		C986F28513FC2B17005662B3 /* NSDictionary+NSDictionary_KeyPath.h in Headers */ = {isa = PBXBuildFile; fileRef = C986F28313FC2B17005662B3 /* NSDictionary+NSDictionary_KeyPath.h */; };
 		C986F28613FC2B17005662B3 /* NSDictionary+NSDictionary_KeyPath.m in Sources */ = {isa = PBXBuildFile; fileRef = C986F28413FC2B17005662B3 /* NSDictionary+NSDictionary_KeyPath.m */; };
 		C987410813E1E94600D7ECF1 /* CKRouterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C987410713E1E94600D7ECF1 /* CKRouterTests.m */; };
 		C996356913F31A7F003E7CDD /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = C996356713F31A7F003E7CDD /* Reachability.h */; };
 		C996356A13F31A7F003E7CDD /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C996356813F31A7F003E7CDD /* Reachability.m */; };
-		C9BD06271408033C00F427A2 /* CKBindingMap.h in Headers */ = {isa = PBXBuildFile; fileRef = C9BD06251408033C00F427A2 /* CKBindingMap.h */; };
+		C9AD4E6814F1F4BE0032BD40 /* CoreSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = C91F9D3214042A2500C42219 /* CoreSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C9BD06271408033C00F427A2 /* CKBindingMap.h in Headers */ = {isa = PBXBuildFile; fileRef = C9BD06251408033C00F427A2 /* CKBindingMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9BD06281408033C00F427A2 /* CKBindingMap.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BD06261408033C00F427A2 /* CKBindingMap.m */; };
-		C9BD062B1408316700F427A2 /* CKRecord+CKBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = C9BD06291408316700F427A2 /* CKRecord+CKBindings.h */; };
+		C9BD062B1408316700F427A2 /* CKRecord+CKBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = C9BD06291408316700F427A2 /* CKRecord+CKBindings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9BD062C1408316700F427A2 /* CKRecord+CKBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BD062A1408316700F427A2 /* CKRecord+CKBindings.m */; };
 		C9C4196413D08CF200B2FC31 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9C4196313D08CF200B2FC31 /* UIKit.framework */; };
 		C9C4196D13D0B57000B2FC31 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9C4196313D08CF200B2FC31 /* UIKit.framework */; };
-		C9C4196E13D0B8D400B2FC31 /* CoreKit.h in Headers */ = {isa = PBXBuildFile; fileRef = C9FB7C1913CF4381009597E7 /* CoreKit.h */; };
+		C9C4196E13D0B8D400B2FC31 /* CoreKit.h in Headers */ = {isa = PBXBuildFile; fileRef = C9FB7C1913CF4381009597E7 /* CoreKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9C4197013D0B97500B2FC31 /* Test.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = C9C4196F13D0B97500B2FC31 /* Test.xcdatamodel */; };
 		C9C4197113D0B97500B2FC31 /* Test.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = C9C4196F13D0B97500B2FC31 /* Test.xcdatamodel */; };
-		C9C4197B13D4A5EF00B2FC31 /* CKConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4197913D4A5EF00B2FC31 /* CKConnection.h */; };
-		C9C4198013D4A61C00B2FC31 /* CKSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4197E13D4A61C00B2FC31 /* CKSerialization.h */; };
-		C9C4198713D4AA8400B2FC31 /* CKNSURLConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4198513D4AA8400B2FC31 /* CKNSURLConnection.h */; };
+		C9C4197B13D4A5EF00B2FC31 /* CKConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4197913D4A5EF00B2FC31 /* CKConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C9C4198013D4A61C00B2FC31 /* CKSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4197E13D4A61C00B2FC31 /* CKSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C9C4198713D4AA8400B2FC31 /* CKNSURLConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C9C4198513D4AA8400B2FC31 /* CKNSURLConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9C4198813D4AA8400B2FC31 /* CKNSURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = C9C4198613D4AA8400B2FC31 /* CKNSURLConnection.m */; };
-		C9F05F3413E6F12300557828 /* CKRecord+CKRouter.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F05F3213E6F12300557828 /* CKRecord+CKRouter.h */; };
+		C9F05F3413E6F12300557828 /* CKRecord+CKRouter.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F05F3213E6F12300557828 /* CKRecord+CKRouter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9F05F3513E6F12300557828 /* CKRecord+CKRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F05F3313E6F12300557828 /* CKRecord+CKRouter.m */; };
-		C9F05F4013E7391700557828 /* CWInflector.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F05F3913E7391700557828 /* CWInflector.h */; };
+		C9F05F4013E7391700557828 /* CWInflector.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F05F3913E7391700557828 /* CWInflector.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9F05F4113E7391700557828 /* CWInflector.mm in Sources */ = {isa = PBXBuildFile; fileRef = C9F05F3A13E7391700557828 /* CWInflector.mm */; };
 		C9F05F4713E7391700557828 /* NSString+InflectionSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F05F3E13E7391700557828 /* NSString+InflectionSupport.h */; };
 		C9F05F4813E7391700557828 /* NSString+InflectionSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F05F3F13E7391700557828 /* NSString+InflectionSupport.m */; };
 		C9F2A48713E1C905005E4711 /* CKSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F2A48513E1C905005E4711 /* CKSupport.h */; };
 		C9F2A48813E1C905005E4711 /* CKSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F2A48613E1C905005E4711 /* CKSupport.m */; };
-		C9F2A4D613E1D067005E4711 /* CKRouterMap.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F2A4D413E1D067005E4711 /* CKRouterMap.h */; };
+		C9F2A4D613E1D067005E4711 /* CKRouterMap.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F2A4D413E1D067005E4711 /* CKRouterMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9F2A4D713E1D067005E4711 /* CKRouterMap.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F2A4D513E1D067005E4711 /* CKRouterMap.m */; };
 		C9F2A599140BF4F300218666 /* CKBindingsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F2A596140BF4BF00218666 /* CKBindingsTests.m */; };
 		C9F2B71813ED99DF0002D6AA /* inflections.plist in Resources */ = {isa = PBXBuildFile; fileRef = C9F05F3B13E7391700557828 /* inflections.plist */; };
-		C9F4F2AD13D759F7009DAC73 /* CKDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F4F2AB13D759F6009DAC73 /* CKDefines.h */; };
+		C9F4F2AD13D759F7009DAC73 /* CKDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F4F2AB13D759F6009DAC73 /* CKDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9F4F2B813D882C7009DAC73 /* CKRecordPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F4F2B613D882C7009DAC73 /* CKRecordPrivate.h */; };
 		C9F4F2B913D882C7009DAC73 /* CKRecordPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F4F2B713D882C7009DAC73 /* CKRecordPrivate.m */; };
-		C9F4F2BE13D8C013009DAC73 /* CKBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F4F2BC13D8C012009DAC73 /* CKBindings.h */; };
+		C9F4F2BE13D8C013009DAC73 /* CKBindings.h in Headers */ = {isa = PBXBuildFile; fileRef = C9F4F2BC13D8C012009DAC73 /* CKBindings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C9F4F2BF13D8C013009DAC73 /* CKBindings.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F4F2BD13D8C012009DAC73 /* CKBindings.m */; };
 		C9FB7C1513CF4381009597E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9FB7C1413CF4381009597E7 /* Foundation.framework */; };
 		C9FB7C2313CF4381009597E7 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9FB7C2213CF4381009597E7 /* SenTestingKit.framework */; };
 		C9FB7C2613CF4381009597E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9FB7C1413CF4381009597E7 /* Foundation.framework */; };
 		C9FB7C2B13CF4381009597E7 /* libCoreKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C9FB7C1113CF4381009597E7 /* libCoreKit.a */; };
 		C9FB7C3113CF4381009597E7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C9FB7C2F13CF4381009597E7 /* InfoPlist.strings */; };
+		C9FDA99A1512BD960071A763 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C9FDA9991512BD960071A763 /* libz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		C94FC37513E8861D002DFD92 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C9FB7C0813CF4381009597E7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C9FB7C1013CF4381009597E7;
+			remoteInfo = CoreKit;
+		};
+		C96557C514EDD27A00032284 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C9FB7C0813CF4381009597E7 /* Project object */;
 			proxyType = 1;
@@ -173,6 +198,7 @@
 		C9FB7C2213CF4381009597E7 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		C9FB7C2E13CF4381009597E7 /* CoreKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreKitTests-Info.plist"; sourceTree = "<group>"; };
 		C9FB7C3013CF4381009597E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C9FDA9991512BD960071A763 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,6 +214,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9FDA99A1512BD960071A763 /* libz.dylib in Frameworks */,
 				C9C4196413D08CF200B2FC31 /* UIKit.framework in Frameworks */,
 				C95D789613CF90B6005C3C29 /* CoreData.framework in Frameworks */,
 				C9FB7C1513CF4381009597E7 /* Foundation.framework in Frameworks */,
@@ -364,6 +391,7 @@
 		C9FB7C1313CF4381009597E7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C9FDA9991512BD960071A763 /* libz.dylib */,
 				C92BA7CD13F4297800EF4BAE /* SystemConfiguration.framework */,
 				C9C4196313D08CF200B2FC31 /* UIKit.framework */,
 				C95D789513CF90B6005C3C29 /* CoreData.framework */,
@@ -438,6 +466,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C96557BF14EDD15F00032284 /* CoreSupport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -469,6 +498,7 @@
 				C9BD06271408033C00F427A2 /* CKBindingMap.h in Headers */,
 				C9BD062B1408316700F427A2 /* CKRecord+CKBindings.h in Headers */,
 				C90A8CF61428F52F00FBDFAD /* CKTableViewDataSource.h in Headers */,
+				C9AD4E6814F1F4BE0032BD40 /* CoreSupport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +530,7 @@
 				C9FB7C0E13CF4381009597E7 /* Frameworks */,
 				C9FB7C0F13CF4381009597E7 /* Headers */,
 				C915059713E889A1004941A5 /* CopyFiles */,
+				C96557C014EDD20A00032284 /* Prepare Framework */,
 			);
 			buildRules = (
 			);
@@ -535,7 +566,7 @@
 		C9FB7C0813CF4381009597E7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = "MNDCreative, LLC";
 			};
 			buildConfigurationList = C9FB7C0B13CF4381009597E7 /* Build configuration list for PBXProject "CoreKit" */;
@@ -553,6 +584,7 @@
 				C9FB7C1013CF4381009597E7 /* CoreKit */,
 				C91F9D2C14042A2500C42219 /* CoreSupport */,
 				C9FB7C2013CF4381009597E7 /* CoreKitTests */,
+				C96557C114EDD26E00032284 /* Framework */,
 			);
 		};
 /* End PBXProject section */
@@ -571,6 +603,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C96557C014EDD20A00032284 /* Prepare Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A\"\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"\n\n# Link the \"Current\" version to \"A\"\nln -sfh A \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/Current\"\nln -sfh Versions/Current/Headers \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Headers\"\nln -sfh \"Versions/Current/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/${PRODUCT_NAME}\"\n\n# The -a ensures that the headers maintain the source modification date so that we don't constantly\n# cause propagating rebuilds of files that import these headers.\ncp -a \"${TARGET_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"";
+		};
+		C96557C714EDD28900032284 /* Prepare Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset +u\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\nexit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_TARGET_NAME=${PROJECT_NAME}\nSF_EXECUTABLE_PATH=\"lib${SF_TARGET_NAME}.a\"\nSF_WRAPPER_NAME=\"${SF_TARGET_NAME}.framework\"\n\n# The following conditonals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\nSF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\necho \"Could not find platform name from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\nSF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\necho \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\nSF_OTHER_PLATFORM=iphonesimulator\nSF_ARCHS=i386\nelse\nSF_OTHER_PLATFORM=iphoneos\n# Force armv6 to be built because Xcode 4 likes to only build armv7\nSF_ARCHS=\"armv6 armv7\"\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\nSF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\necho \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\nexit 1\nfi\n\n# Build the other platform.\nxcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${SF_OTHER_PLATFORM}\" ARCHS=\"${SF_ARCHS}\" $ACTION\n\n# Smash the two static libraries into one fat binary and store it in the .framework\nlipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"";
+		};
 		C9FB7C1F13CF4381009597E7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -647,6 +707,11 @@
 			target = C9FB7C1013CF4381009597E7 /* CoreKit */;
 			targetProxy = C94FC37513E8861D002DFD92 /* PBXContainerItemProxy */;
 		};
+		C96557C614EDD27A00032284 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C9FB7C1013CF4381009597E7 /* CoreKit */;
+			targetProxy = C96557C514EDD27A00032284 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -687,6 +752,20 @@
 			};
 			name = Release;
 		};
+		C96557C314EDD26E00032284 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C96557C414EDD26E00032284 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		C9FB7C3613CF4381009597E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -694,6 +773,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -718,7 +798,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREFIX_HEADER = "CoreKit/CoreKit-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -747,7 +828,9 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SKIP_INSTALL = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Debug;
 		};
@@ -763,7 +846,9 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SKIP_INSTALL = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
@@ -815,6 +900,15 @@
 			buildConfigurations = (
 				C91F9D3514042A2500C42219 /* Debug */,
 				C91F9D3614042A2500C42219 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C96557C214EDD26E00032284 /* Build configuration list for PBXAggregateTarget "Framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C96557C314EDD26E00032284 /* Debug */,
+				C96557C414EDD26E00032284 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

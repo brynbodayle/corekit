@@ -22,8 +22,8 @@ NSArray* CK_SORT(NSString *sort){
         
         for (int chunkIdx = 0; chunkIdx < [sortChunks count]; chunkIdx += 2) {
             
-            [sortDescriptors addObject:[[NSSortDescriptor alloc] initWithKey:[sortChunks objectAtIndex:chunkIdx] ascending:
-			   [[sortChunks objectAtIndex:chunkIdx + 1] caseInsensitiveCompare:@"asc"] == NSOrderedSame]];
+            [sortDescriptors addObject:[[NSSortDescriptor alloc] initWithKey:sortChunks[chunkIdx] ascending:
+			   [sortChunks[chunkIdx + 1] caseInsensitiveCompare:@"asc"] == NSOrderedSame]];
         }
     }
     
@@ -49,7 +49,7 @@ NSString* CKPathForDocumentsResource(NSString* relativePath) {
         NSArray* dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
                                                             NSUserDomainMask,
                                                             YES);
-        documentsPath = [dirs objectAtIndex:0];
+        documentsPath = dirs[0];
     }
     return [documentsPath stringByAppendingPathComponent:relativePath];
 }

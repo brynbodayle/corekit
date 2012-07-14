@@ -107,14 +107,14 @@
     
     if([[_bindings allKeys] containsObject:className]){
         
-        NSMutableArray *maps = [[_bindings objectForKey:className] mutableCopy];
+        NSMutableArray *maps = [_bindings[className] mutableCopy];
         
         [maps addObject:map];
-        [_bindings setObject:maps forKey:className];
+        _bindings[className] = maps;
     }
     else{
         
-        [_bindings setObject:[NSArray arrayWithObject:map] forKey:className];
+        _bindings[className] = @[map];
     }
 }
 
@@ -138,7 +138,7 @@
 
 - (NSArray *) bindingsForModel:(NSManagedObject *)model forChangeType:(CKBindingChangeType) changeType{
     
-    NSMutableArray *modelBindings = [_bindings objectForKey:[[model class] description]];
+    NSMutableArray *modelBindings = _bindings[[[model class] description]];
     
      if(modelBindings != nil){
          
@@ -152,7 +152,7 @@
         }];
      }
      else {
-         modelBindings = [NSArray array];
+         modelBindings = [NSMutableArray array];
      }
            
     return modelBindings;
@@ -160,7 +160,7 @@
 
 - (NSArray *) bindingsForEntity:(Class) entity forChangeType:(CKBindingChangeType) changeType{
     
-    NSMutableArray *entityBindings = [_bindings objectForKey:[entity description]];
+    NSMutableArray *entityBindings = _bindings[[entity description]];
     
     if(entityBindings != nil){
         
@@ -174,7 +174,7 @@
         }];
     }
     else {
-        entityBindings = [NSArray array];
+        entityBindings = [NSMutableArray array];
     }
     
     return entityBindings;
@@ -200,9 +200,9 @@
 
 - (void) handleChangeNotification:(NSNotification *) notification{
         
-    [self handleChangesForObjects:[[notification userInfo] objectForKey:NSInsertedObjectsKey] ofChangeType:CKBindingChangeTypeInserted];
-    [self handleChangesForObjects:[[notification userInfo] objectForKey:NSUpdatedObjectsKey] ofChangeType:CKBindingChangeTypeUpdated];
-    [self handleChangesForObjects:[[notification userInfo] objectForKey:NSDeletedObjectsKey] ofChangeType:CKBindingChangeTypeDeleted];
+    [self handleChangesForObjects:[notification userInfo][NSInsertedObjectsKey] ofChangeType:CKBindingChangeTypeInserted];
+    [self handleChangesForObjects:[notification userInfo][NSUpdatedObjectsKey] ofChangeType:CKBindingChangeTypeUpdated];
+    [self handleChangesForObjects:[notification userInfo][NSDeletedObjectsKey] ofChangeType:CKBindingChangeTypeDeleted];
     
     [_firedMaps removeAllObjects];
 }

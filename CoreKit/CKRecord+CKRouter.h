@@ -23,8 +23,6 @@
 
 + (void) mapAttribute:(NSString *) attribute toRemoteKey:(NSString *) remoteKey;
 
-+ (NSDictionary *) attributeMap;
-
 + (NSString *) attributeForRemoteKey:(NSString *) remoteKey;
 + (NSString *) remoteKeyForAttribute:(NSString *) attribute;
 

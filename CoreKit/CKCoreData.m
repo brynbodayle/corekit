@@ -27,7 +27,7 @@
     self = [super init];
     if (self) {
 
-        self.managedObjectContext = [self newManagedObjectContext];
+        self.managedObjectContext = [self newManagedObjectContext:NSMainQueueConcurrencyType];
         self.managedObjectModel = [self managedObjectModel];
 		self.persistentStoreCoordinator = [self persistentStoreCoordinator];
         
@@ -58,26 +58,33 @@
     else{
 		
 		NSMutableDictionary *threadDictionary = [[NSThread currentThread] threadDictionary];
-		NSManagedObjectContext *backgroundThreadContext = [threadDictionary objectForKey:ckCoreDataThreadKey];
+		NSManagedObjectContext *backgroundThreadContext = threadDictionary[ckCoreDataThreadKey];
 		
-		if (!backgroundThreadContext) {
+		if (!backgroundThreadContext && ![NSThread mainThread]) {
 			
-			backgroundThreadContext = [self newManagedObjectContext];					
-			[threadDictionary setObject:backgroundThreadContext forKey:ckCoreDataThreadKey];			
+			backgroundThreadContext = [self newManagedObjectContext:NSPrivateQueueConcurrencyType];
+            backgroundThreadContext.parentContext = _managedObjectContext;
 		}
+        else if(!backgroundThreadContext && [NSThread mainThread]){
+            
+            backgroundThreadContext = [self newManagedObjectContext:NSMainQueueConcurrencyType];
+        }
+        
+        threadDictionary[ckCoreDataThreadKey] = backgroundThreadContext;
         
 		return backgroundThreadContext;
 	}
 }
 
-- (NSManagedObjectContext*) newManagedObjectContext{
+- (NSManagedObjectContext*) newManagedObjectContext:(NSManagedObjectContextConcurrencyType) concurrencyType{
 	
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-	[moc setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
-	[moc setUndoManager:nil];
-	[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
+	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:concurrencyType];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChanges:) name:NSManagedObjectContextDidSaveNotification object:moc];
+    if(concurrencyType == NSMainQueueConcurrencyType)
+        moc.persistentStoreCoordinator = [self persistentStoreCoordinator];
+    
+    moc.undoManager = nil;
+    moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
     
 	return moc;
 }
@@ -92,11 +99,11 @@
         NSArray *files = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"momd" subdirectory:@"."];
         
         if([files count] > 0)
-            _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[files objectAtIndex:0]];
+            _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:files[0]];
     }
         
     if(_managedObjectModel == nil)
-        _managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:[NSArray arrayWithObject:[NSBundle bundleForClass:[self class]]]];
+        _managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:@[[NSBundle bundleForClass:[self class]]]];
     
     
 	return _managedObjectModel;
@@ -138,19 +145,7 @@
 
 - (NSDictionary *) persistentStoreOptions{
     
-    return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,nil];
-}
-
-- (void) managedObjectContextDidSave:(NSNotification *)notification{
-
-	[self.managedObjectContext performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:)
-												withObject:notification
-											 waitUntilDone:YES];
-}
-
-- (void) mergeChanges:(NSNotification *)notification {
-    
-	[self performSelectorOnMainThread:@selector(managedObjectContextDidSave:) withObject:notification waitUntilDone:YES];
+    return @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
 }
 
 - (NSString *) storePath{
@@ -165,11 +160,14 @@
 
 - (NSString *) applicationDocumentsDirectory {	
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    NSString *basePath = ([paths count] > 0) ? paths[0] : nil;
     return basePath;
 }
 
 - (BOOL) save{
+    
+    if(![self.managedObjectContext hasChanges])
+        return YES;
     
     int insertedObjectsCount = [[self.managedObjectContext insertedObjects] count];
 	int updatedObjectsCount = [[self.managedObjectContext updatedObjects] count];
@@ -178,11 +176,12 @@
 	NSDate *startTime = [NSDate date];
     
 	NSError *error = nil;
-    BOOL saved = [self.managedObjectContext save:&error];
-    
-	if(!saved) {
-		NSLog(@"******** CORE DATA FAILURE: Failed to save to data store: %@", [error localizedDescription]);
-		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
+    @try {
+        [self.managedObjectContext save:&error];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"******** CORE DATA FAILURE: Failed to save to data store: %@", [error localizedDescription]);
+		NSArray* detailedErrors = [error userInfo][NSDetailedErrorsKey];
 		if(detailedErrors != nil && [detailedErrors count] > 0) {
 			for(NSError* detailedError in detailedErrors) {
 				NSLog(@"  DetailedError: %@", [detailedError userInfo]);
@@ -191,13 +190,54 @@
 		else {
 			NSLog(@"******** CORE DATA FAILURE: %@", [error userInfo]);
 		}
-		
-		return NO;
-	}
+    }
+    @finally {
+        
+    }
 	
     NSLog(@"Created: %i, Updated: %i, Deleted: %i, Time: %f seconds", insertedObjectsCount, updatedObjectsCount, deletedObjectsCount, ([startTime timeIntervalSinceNow] *-1));
     
-    return saved;
+    if(self.managedObjectContext.parentContext != nil){
+        
+        [self.managedObjectContext.parentContext performBlock:^{
+           
+            [self.managedObjectContext.parentContext save:nil];
+        }];
+    }
+    
+    return YES;
 }
+
+- (NSManagedObject *)objectWithURI:(NSURL *)uri {
+    
+    NSManagedObjectID *objectID =
+    [[self persistentStoreCoordinator] managedObjectIDForURIRepresentation:uri];
+    
+    if (!objectID) {
+        return nil;
+    }
+    
+    NSManagedObject *objectForID = [self.managedObjectContext objectWithID:objectID];
+    
+    if (![objectForID isFault]){
+        return objectForID;
+    }
+    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:[objectID entity]];
+    
+    NSPredicate *predicate = [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForEvaluatedObject] rightExpression: [NSExpression expressionForConstantValue:objectForID] modifier:NSDirectPredicateModifier type:NSEqualToPredicateOperatorType options:0];
+    
+    [request setPredicate:predicate];
+    
+    NSArray *results = [self.managedObjectContext executeFetchRequest:request error:nil];
+    if ([results count] > 0 )
+    {
+        return results[0];
+    }
+    
+    return nil;
+}
+
 
 @end

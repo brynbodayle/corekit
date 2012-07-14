@@ -123,7 +123,7 @@
         }];
                 
         if(index != NSNotFound)
-            map = [routes objectAtIndex:index];
+            map = routes[index];
     }
         
     return map;
@@ -131,7 +131,7 @@
     
 - (NSArray *) mapsForModel:(Class) model{
     
-    return [_routes objectForKey:[model description]];
+    return _routes[[model description]];
 }
 
 - (NSDictionary *) attributeMapForModel:(Class) model{
@@ -143,7 +143,7 @@
     [maps enumerateObjectsUsingBlock:^(CKRouterMap *map, NSUInteger idx, BOOL *stop){
         
         if([map isAttributeMap])
-            [attributes setObject:map.remoteAttribute forKey:map.localAttribute];
+            attributes[map.localAttribute] = map.remoteAttribute;
     }];
     
     return attributes;
@@ -155,21 +155,21 @@
     
     if([[_routes allKeys] containsObject:className]){
         
-        NSMutableArray *maps = [[_routes objectForKey:className] mutableCopy];
+        NSMutableArray *maps = [_routes[className] mutableCopy];
         
         [maps addObject:map];
-        [_routes setObject:maps forKey:className];
+        _routes[className] = maps;
     }
     else{
         
-        [_routes setObject:[NSArray arrayWithObject:map] forKey:className];
+        _routes[className] = @[map];
     }
 }
 
 - (NSString *) localAttributeForRemoteKey:(NSString *) remoteAttribute forModel:(Class) model{
     
     NSArray *maps = [self mapsForModel:model];
-    __block NSString *attribute = nil;
+    __block NSString *attribute = remoteAttribute;
     
     [maps enumerateObjectsUsingBlock:^(CKRouterMap *map, NSUInteger idx, BOOL *stop){
         
@@ -230,7 +230,7 @@
             [maps addObject:[model mapForRequestMethod:(CKRequestMethod) x]];
         }
         
-        [_routes setObject:maps forKey:key];
+        _routes[key] = maps;
     }];
     
     //[_routes writeToFile:ckRouterCacheFile atomically:NO];

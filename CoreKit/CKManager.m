@@ -15,23 +15,6 @@
 
 @implementation CKManager
 
-@synthesize fixtureSerializationClass = _fixtureSerializationClass;
-@synthesize serializationClass = _serializationClass;
-@synthesize connectionClass = _connectionClass;
-@synthesize coreData = _coreData;
-@synthesize bindings = _bindings;
-@synthesize router = _router;
-@synthesize baseURL = _baseURL;
-@synthesize httpUser = _httpUser;
-@synthesize httpPassword = _httpPassword;
-@synthesize responseKeyPath = _responseKeyPath;
-@synthesize serializer = _serializer;
-@synthesize fixtureSerializer = _fixtureSerializer;
-@synthesize dateFormatter = _dateFormatter;
-@synthesize dateFormat = _dateFormat;
-@synthesize batchAllRequests = _batchAllRequests;
-@synthesize secureAllConnections = _secureAllConnections;
-
 #pragma mark -
 # pragma mark Initializations
 
@@ -91,7 +74,7 @@
     return self.coreData.managedObjectModel;
 }
 
-- (id) parse:(id) object{
+- (id) deserialize:(id) object{
     
     return [self.serializer deserialize:object];
 }
@@ -131,7 +114,7 @@
         [self sendBatchRequest:request];
     
     else
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             [request.connection send:request];
         });
 }
@@ -154,7 +137,7 @@
             
             for(NSManagedObject *obj in result.objects){
                 
-                id managedObject = [[CKManager sharedManager].managedObjectContext objectWithID:[obj objectID]];
+                id managedObject = [[CKManager sharedManager].managedObjectContext existingObjectWithID:[obj objectID] error:nil];
                                     
                 if(managedObject != nil)
                     [objects addObject:managedObject];
@@ -207,11 +190,11 @@
         
         if(value == nil){
             
-            error = [NSError errorWithDomain:@"com.corekit" code:1 userInfo:[NSDictionary dictionaryWithObject:content forKey:file]];
+            error = [NSError errorWithDomain:@"com.corekit" code:1 userInfo:@{file: content}];
             continue;
         }
         
-        NSMutableString *class = [NSMutableString stringWithString:[[[file stringByDeletingPathExtension] componentsSeparatedByString:@"_"] objectAtIndex:0]];
+        NSMutableString *class = [NSMutableString stringWithString:[[file stringByDeletingPathExtension] componentsSeparatedByString:@"_"][0]];
         
         if([ckCoreDataClassPrefix length] > 0)
             [class replaceOccurrencesOfString:ckCoreDataClassPrefix withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [ckCoreDataClassPrefix length])];

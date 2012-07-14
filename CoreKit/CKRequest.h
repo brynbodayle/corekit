@@ -11,7 +11,7 @@
 #import "CKSerialization.h"
 #import "CKResult.h"
 
-@class CKRouterMap;
+@class CKRouterMap,CKRecord;
 
 typedef void (^CKBasicBlock) ();
 typedef void (^CKResultBlock) (CKResult *result);
@@ -49,7 +49,7 @@ typedef enum CKRequestInterval {
 /**
  * The standard request object for all HTTP requests
  */
-@interface CKRequest : NSObject
+@interface CKRequest : NSObject <CKConnectionDelegate>
 
 @property (nonatomic, strong) CKRouterMap *routerMap;
 @property (nonatomic, strong) NSString *username;
@@ -59,6 +59,7 @@ typedef enum CKRequestInterval {
 @property (nonatomic, strong) NSMutableDictionary *headers;
 @property (nonatomic, strong) NSMutableDictionary *parameters;
 @property (nonatomic, strong) id body;
+@property (nonatomic, assign) dispatch_queue_t delegateThread;
 @property (nonatomic, assign) BOOL syncronous;
 @property (nonatomic, assign) BOOL started;
 @property (nonatomic, assign) BOOL completed;
@@ -66,6 +67,7 @@ typedef enum CKRequestInterval {
 @property (nonatomic, assign) BOOL isBatched;
 @property (nonatomic, assign) BOOL batch;
 @property (nonatomic, assign) BOOL secure;
+@property (nonatomic, assign) BOOL hasFile;
 @property (nonatomic, strong) NSString *batchPageString;
 @property (nonatomic, strong) NSString *batchMaxPerPageString;
 @property (nonatomic, assign) NSUInteger batchNumPerPage;
@@ -79,6 +81,7 @@ typedef enum CKRequestInterval {
 @property (nonatomic, copy) CKResultBlock errorBlock;
 @property (nonatomic, copy) CKParseBlock parseBlock;
 @property (nonatomic, strong) NSString *baseURL;
+@property (nonatomic, strong) id relationshipObject;
 
 + (CKRequest *) request;
 + (CKRequest *) requestWithRemotePath:(NSString *) remotePath;
@@ -91,6 +94,7 @@ typedef enum CKRequestInterval {
 - (void) addHeaders:(NSDictionary *) data;
 - (void) send;
 - (CKResult *) sendSyncronously;
+- (void) addFile:(NSData *) fileData withName:(NSString *) name;
 - (void) scheduleRepeatRequest;
 
 @end

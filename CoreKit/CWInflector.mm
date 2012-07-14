@@ -42,12 +42,12 @@
 - (void)addInflectionsFromFile:(NSString*)path;
 {
 	NSDictionary* inflections = [NSDictionary dictionaryWithContentsOfFile:path];
-	[plurals addObjectsFromArray:[inflections objectForKey:@"plurals"]];
-	[singulars addObjectsFromArray:[inflections objectForKey:@"singulars"]];
-	[uncountables addObjectsFromArray:[inflections objectForKey:@"uncountables"]];
+	[plurals addObjectsFromArray:inflections[@"plurals"]];
+	[singulars addObjectsFromArray:inflections[@"singulars"]];
+	[uncountables addObjectsFromArray:inflections[@"uncountables"]];
     
-	for(NSArray* irregular in [inflections objectForKey:@"irregulars"])
-		[self addIrregular:[irregular objectAtIndex:0] plural:[irregular objectAtIndex:1]];
+	for(NSArray* irregular in inflections[@"irregulars"])
+		[self addIrregular:irregular[0] plural:irregular[1]];
 }
 
 - (void)addIrregular:(NSString*)singular plural:(NSString*)plural;
@@ -63,12 +63,12 @@
 
 - (void)addPluralPattern:(NSString*)pattern substitution:(NSString*)substitution;
 {
-	[plurals addObject:[NSArray arrayWithObjects:pattern,substitution,nil]];
+	[plurals addObject:@[pattern,substitution]];
 }
 
 - (void)addSingularPattern:(NSString*)pattern substitution:(NSString*)substitution;
 {
-	[singulars addObject:[NSArray arrayWithObjects:pattern,substitution,nil]];
+	[singulars addObject:@[pattern,substitution]];
 }
 
 - (NSString*)pluralFormOf:(NSString*)singular;
@@ -79,9 +79,9 @@
 	NSEnumerator* enumerator = [plurals reverseObjectEnumerator];
 	while(NSArray* conversion = [enumerator nextObject])
 	{
-        NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:[conversion objectAtIndex:0] options:0 error:nil];
+        NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:conversion[0] options:0 error:nil];
         
-        NSString *result = [expression stringByReplacingMatchesInString:singular options:0 range:NSMakeRange(0, [singular length]) withTemplate:[conversion objectAtIndex:1]];
+        NSString *result = [expression stringByReplacingMatchesInString:singular options:0 range:NSMakeRange(0, [singular length]) withTemplate:conversion[1]];
 
 		if(result && ![result isEqualToString:singular])
 			return result;
@@ -97,9 +97,9 @@
 	NSEnumerator* enumerator = [singulars reverseObjectEnumerator];
 	while(NSArray* conversion = [enumerator nextObject])
 	{
-        NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:[conversion objectAtIndex:0] options:0 error:nil];
+        NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:conversion[0] options:0 error:nil];
         
-        NSString *result = [expression stringByReplacingMatchesInString:plural options:0 range:NSMakeRange(0, [plural length]) withTemplate:[conversion objectAtIndex:1]];
+        NSString *result = [expression stringByReplacingMatchesInString:plural options:0 range:NSMakeRange(0, [plural length]) withTemplate:conversion[1]];
 
 		if(result && ![result isEqualToString:plural])
 			return result;

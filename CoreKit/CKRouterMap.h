@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSString *localAttribute;
 @property (nonatomic, strong) NSString *remoteAttribute;
 @property (nonatomic, strong) NSString *responseKeyPath;
+@property (nonatomic, strong) NSString *errorKeyPath;
 @property (nonatomic, assign) CKRequestMethod requestMethod;
 @property (nonatomic, assign) BOOL isInstanceMap;
 

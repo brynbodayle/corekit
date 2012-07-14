@@ -12,6 +12,11 @@
 #import "CKManager.h"
 #import "NSString+InflectionSupport.h"
 #import <UIKit/UIKit.h>
+#import "zlib.h"
+
+
+static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
+static NSString * const FORM_FLE_INPUT = @"photo[image]";
 
 @implementation CKRequest
 
@@ -43,6 +48,8 @@
 @synthesize errorBlock = _errorBlock;
 @synthesize parseBlock = _parseBlock;
 @synthesize baseURL=_baseURL;
+@synthesize relationshipObject = _relationshipObject;
+@synthesize hasFile = _hasFile;
 
 - (id) initWithRouterMap:(CKRouterMap *) map{
 
@@ -62,6 +69,7 @@
         _completionBlock = nil;
         _errorBlock = nil;
         _parseBlock = nil;
+        _delegateThread = dispatch_get_main_queue();
         self.routerMap = map;
     }
     
@@ -102,6 +110,20 @@
         
         _body = body;
     }
+}
+
+- (void) addFile:(NSData *) fileData withName:(NSString *) name{
+    
+    _hasFile = YES;
+    
+    _headers[@"Content-Type"] = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", BOUNDRY];
+    NSMutableData *postData = [NSMutableData dataWithCapacity:[fileData length] + 512];
+    [postData appendData:[[NSString stringWithFormat:@"--%@\r\n", BOUNDRY] dataUsingEncoding:NSUTF8StringEncoding]];
+    [postData appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n\r\n", FORM_FLE_INPUT,name] dataUsingEncoding:NSUTF8StringEncoding]];
+    [postData appendData:fileData];
+    [postData appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n", BOUNDRY] dataUsingEncoding:NSUTF8StringEncoding]];
+        
+    _body = postData;
 }
 
 - (void) addHeaders:(NSDictionary *) data{
@@ -183,10 +205,10 @@
     
     if(_batch || _isBatched || [CKManager sharedManager].batchAllRequests){
         
-        if(![_parameters objectForKey:_batchMaxPerPageString])
-            [_parameters setObject:[NSString stringWithFormat:@"%i", _batchNumPerPage] forKey:_batchMaxPerPageString];
+        if(!_parameters[_batchMaxPerPageString])
+            _parameters[_batchMaxPerPageString] = [NSString stringWithFormat:@"%i", _batchNumPerPage];
         
-        [_parameters setObject:[NSString stringWithFormat:@"%i", _batchCurrentPage] forKey:_batchPageString];
+        _parameters[_batchPageString] = [NSString stringWithFormat:@"%i", _batchCurrentPage];
     }
         
     if([_parameters count] > 0)
@@ -245,6 +267,49 @@
     CKRequest *request = [timer userInfo];
     request.interval = CKRequestIntervalNone;
     [[CKManager sharedManager] sendRequest:request];
+}
+
+
+// delegate methods
+
+- (void) connection:(id<CKConnection>)connection didFailWithResult:(CKResult *)result{
+    
+    if(_errorBlock != nil){
+        
+        dispatch_async(_delegateThread, ^{
+                
+            _errorBlock(result);
+        });
+    }
+}
+
+- (void) connection:(id<CKConnection>)connection didFinishWithResult:(CKResult *)result{
+    
+    if(_completionBlock != nil && ![result isError]){
+        
+        dispatch_async(_delegateThread, ^{
+            
+            _completionBlock(result);
+        });
+    }
+    else if(_errorBlock != nil && [result isError]){
+        
+        dispatch_async(_delegateThread, ^{
+            
+            _errorBlock(result);
+        });
+    }
+}
+
+- (void) connection:(id<CKConnection>)connection didParseObject:(id)object{
+    
+    if(_parseBlock != nil){
+        
+        dispatch_async(_delegateThread, ^{
+            
+            _parseBlock(object);
+        });
+    }
 }
 
 @end

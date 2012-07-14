@@ -17,6 +17,7 @@
 @property (nonatomic, strong) CKRequest *request;
 @property (nonatomic, strong) NSURLConnection *connection;
 @property (nonatomic, strong) NSDictionary *responseHeaders;
+@property (nonatomic, strong) NSOperationQueue *syncronousQueue;
 
 - (BOOL) connectionVerified;
 - (void) printDebug:(CKResult *) result;

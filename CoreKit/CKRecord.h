@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "CKRequest.h"
 #import "CKResult.h"
-#import "CKSupport.h"
 
 @class CKSearch, CKRecord;
 
@@ -131,10 +130,15 @@ typedef enum CKRecordOptions {
 - (CKRequest *) requestForPut;
 
 - (void) get:(CKParseBlock) parseBlock completionBlock:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock;
+- (void) getWithRelationships:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock;
 - (CKRequest *) requestForGet;
 
 - (void) removeRemotely:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock;
 - (CKRequest *) requestForRemoveRemotely;
+
+- (CKResult *) fetchRelationshipSyncronously:(NSString *) relationship;
+- (void) fetchRelationship:(NSString *) relationship parseBlock:(CKParseBlock) parseBlock completionBlock:(CKResultBlock) completionBlock errorBlock:(CKResultBlock) errorBlock;
+- (CKRequest *) requestForRelationship:(NSString *) relationship;
 
 - (id) serialize;
 - (NSMutableDictionary *) serializedValue;
@@ -272,5 +276,12 @@ typedef enum CKRecordOptions {
 + (NSString *) primaryKeyName;
 
 + (NSString *) baseURL;
+
+- (CKRecord *) threadedSafeSelf;
+
+/** Array of relationship names to fetch */
+- (NSArray *) relationshipsToFetch;
+- (NSDictionary *) relationships;
+- (NSString *) keyForInverseOfSelfInObject:(CKRecord *) object;
 
 @end

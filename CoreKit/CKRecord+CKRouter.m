@@ -9,6 +9,7 @@
 #import "CKRecord+CKRouter.h"
 #import "CKRecord.h"
 #import "NSString+InflectionSupport.h"
+#import "CoreSupport.h"
 
 @implementation CKRecord (CKRouter_CKRecord)
 
@@ -47,11 +48,6 @@
     [[CKRouter sharedRouter] mapLocalAttribute:attribute toRemoteKey:remoteKey forModel:[self class]];
 }
 
-+ (NSDictionary *) attributeMap{
-    
-    return [[CKRouter sharedRouter] attributeMapForModel:[self class]];
-}
-
 + (NSString *) attributeForRemoteKey:(NSString *) remoteKey{
     
     return [[CKRouter sharedRouter] localAttributeForRemoteKey:remoteKey forModel:[self class]];
@@ -73,7 +69,7 @@
         map.requestMethod = method;
         
         NSString *resourceName = [[self entityNameWithPrefix:NO] pluralForm];
-        map.remotePath = $S(@"%@/%@", [self baseURL], resourceName);
+        map.remotePath = $S(@"%@/%@", [self baseURL], [resourceName lowercaseString]);
     }
     
     return map;
@@ -94,7 +90,7 @@
         if(classMap == nil){
             
             NSString *resourceName = [[[self class] entityNameWithPrefix:NO] pluralForm];
-            map.remotePath = [NSString stringWithFormat:@"%@/%@/(%@)", [[self class] baseURL], resourceName, [[self class] primaryKeyName]];
+            map.remotePath = [NSString stringWithFormat:@"%@/%@/(%@)", [[self class] baseURL], [resourceName lowercaseString], [[self class] primaryKeyName]];
         }
         else{
             
@@ -115,21 +111,21 @@
 
 - (CKRouterMap *) mapForRelationship:(NSString *) relationship forRequestMethod:(CKRequestMethod) method{
     
-    CKRouterMap *map = [self mapForRequestMethod:method];
+    CKRouterMap *map = [self mapForRequestMethod:CKRequestMethodGET];
+    
+    NSString *parentPath = [map.remotePath stringByReplacingOccurrencesOfString:[[self class] baseURL] withString:@""];
+    
+    if([[parentPath substringToIndex:0] isEqualToString:@"/"]){
+      
+        parentPath = [parentPath substringFromIndex:1];
+    };
     
     NSDictionary *relationships = [[[self class] entityDescription] relationshipsByName];
     
     if([[relationships allKeys] containsObject:relationship]){
         
-        NSRelationshipDescription *description = [relationships objectForKey:relationship];
-        
-        Class model = NSClassFromString([[description destinationEntity] managedObjectClassName]);
-        
-        CKRouterMap *relationshipMap = [model mapForRequestMethod:method];
-        
-        NSString *className = [relationshipMap.remotePath stringByReplacingOccurrencesOfString:[[[self class] entityNameWithPrefix:NO] lowercaseString] withString:@""];
-        
-        map.remotePath = [map.remotePath stringByAppendingFormat:@"/%@", className];
+        map.remotePath = $S(@"%@/%@/%@", [[self class] baseURL], parentPath, relationship);
+        map.localAttribute = relationship;
     }
     
     return map;

@@ -20,6 +20,7 @@
 @synthesize request = _request;
 @synthesize connection = _connection;
 @synthesize responseHeaders = _responseHeaders;
+@synthesize syncronousQueue = _syncronousQueue;
 
 #define LOG_DEBUG YES
 
@@ -28,6 +29,7 @@
     self = [super init];
     if (self) {
         
+        self.syncronousQueue = [[NSOperationQueue alloc] init];
         _responseData = [[NSMutableData alloc] init];
     }
     
@@ -72,23 +74,22 @@
 
 - (CKResult *) sendSyncronously:(CKRequest *) request{
 	
-    NSHTTPURLResponse *httpResponse = nil;
-	NSError *error = nil;
-    self.request = request;
+    __block CKResult *syncResult = [CKResult resultWithRequest:request andResponseBody:nil];
+    __block BOOL finished = NO;
     
-	if(![self connectionVerified])
-		return [CKResult resultWithRequest:request andResponseBody:nil];	
+    request.completionBlock = ^(CKResult *result){
+        finished = YES;
+    };
     
-	NSData *response = [NSURLConnection sendSynchronousRequest:[_request remoteRequest] returningResponse:&httpResponse error:&error];
+    [self send:request];
+        
+    NSURLResponse *response;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:[request remoteRequest] returningResponse:&response error:nil];
+    [syncResult setResponseBody:responseData];
     
-	_responseCode = [httpResponse statusCode];
-    self.responseHeaders = [httpResponse allHeaderFields];
+    [self printDebug:syncResult];
     
-	CKResult *result = [[CKResult alloc] initWithRequest:_request responseBody:response httpResponse:httpResponse error:&error];
-    
-    [self printDebug:result];
-    
-    return result;
+    return syncResult;
 }
 
 - (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response{
@@ -101,10 +102,9 @@
     
 	if(_request.parseBlock != nil){
         
-        id object = [[CKManager sharedManager] parse:data];
+        id object = [[CKManager sharedManager] deserialize:data];
         
-        if(object != nil)
-            _request.parseBlock(object);
+        [_request connection:self didParseObject:object];
     }
     
     [_responseData appendData:data];
@@ -123,8 +123,7 @@
 	
 	CKResult *result = [CKResult resultWithRequest:_request andError:&error];
     
-	if(_request.errorBlock != nil)
-        _request.errorBlock(result);
+	[_request connection:self didFailWithResult:result];
     
     [self printDebug:result];
 }
@@ -134,18 +133,13 @@
     _request.completed = YES;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
-	if(self.request.completionBlock != nil){
+    CKResult *result = [CKResult resultWithRequest:_request andResponseBody:_responseData];
+    result.responseCode = _responseCode;
+    result.responseHeaders = _responseHeaders;
         
-        CKResult *result = [CKResult resultWithRequest:_request andResponseBody:_responseData];
-        result.responseCode = _responseCode;
-        result.responseHeaders = _responseHeaders;
-        
-        [self printDebug:result];
-        
-        _request.completionBlock(result);	
-    }
-    else
-        [self printDebug:nil];
+    [_request connection:self didFinishWithResult:result];
+    
+    [self printDebug:nil];
 }
 
 @end

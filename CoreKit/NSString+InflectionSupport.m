@@ -79,13 +79,13 @@ static NSMutableDictionary *cachedCamelized;
     if (cachedCamelized == nil)
         cachedCamelized = [NSMutableDictionary dictionary];
     else {
-        NSString* cached = [cachedCamelized objectForKey:self];
+        NSString* cached = cachedCamelized[self];
         if (cached != nil)
             return cached;
     }
     
     NSString* camelized = [self camelize];
-    [cachedCamelized setObject:camelized forKey:self];
+    cachedCamelized[self] = camelized;
     return camelized;
 }
 
@@ -154,18 +154,18 @@ static NSMutableDictionary *cachedCamelized;
         [scanner scanCharactersFromSet:delimiterSet intoString:NULL];
         NSArray* kvPair = [pairString componentsSeparatedByString:@"="];
         if (kvPair.count == 1 || kvPair.count == 2) {
-            NSString* key = [[kvPair objectAtIndex:0]
+            NSString* key = [kvPair[0]
                              stringByReplacingPercentEscapesUsingEncoding:encoding];
-            NSMutableArray* values = [pairs objectForKey:key];
+            NSMutableArray* values = pairs[key];
             if (nil == values) {
                 values = [NSMutableArray array];
-                [pairs setObject:values forKey:key];
+                pairs[key] = values;
             }
             if (kvPair.count == 1) {
                 [values addObject:[NSNull null]];
                 
             } else if (kvPair.count == 2) {
-                NSString* value = [[kvPair objectAtIndex:1]
+                NSString* value = [kvPair[1]
                                    stringByReplacingPercentEscapesUsingEncoding:encoding];
                 [values addObject:value];
             }
@@ -182,7 +182,7 @@ static NSMutableDictionary *cachedCamelized;
 - (NSString*)stringByAddingQueryDictionary:(NSDictionary*)query {
     NSMutableArray* pairs = [NSMutableArray array];
     for (NSString* key in [query keyEnumerator]) {
-        NSString* value = [query objectForKey:key];
+        NSString* value = query[key];
         value = [value stringByReplacingOccurrencesOfString:@"?" withString:@"%3F"];
         value = [value stringByReplacingOccurrencesOfString:@"=" withString:@"%3D"];
         NSString* pair = [NSString stringWithFormat:@"%@=%@", key, value];

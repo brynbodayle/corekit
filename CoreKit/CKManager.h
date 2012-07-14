@@ -41,7 +41,7 @@
 /** Parse any object to native objects 
  
  */
-- (id) parse:(id) object;
+- (id) deserialize:(id) object;
 
 
 /** Serialize a native object to NSString
@@ -92,10 +92,11 @@
  If response objects are not at the top level, you can specify the path to those objects (ex: Twitter, "results")
  */
 @property (nonatomic, strong) NSString *responseKeyPath;
+@property (nonatomic, strong) NSString *errorKeyPath;
 
 /** Internal connection instance */
-@property (nonatomic, readonly, strong) id <CKSerialization> serializer;
-@property (nonatomic, readonly, strong) id <CKSerialization> fixtureSerializer;
+@property (nonatomic, strong) id <CKSerialization> serializer;
+@property (nonatomic, strong) id <CKSerialization> fixtureSerializer;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSString *dateFormat;
 

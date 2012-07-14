@@ -22,7 +22,7 @@
     return value;
 }
 
-- (id) serialize:(id) object{
+- (NSData *) serialize:(id) object{
     
     NSData *value = nil;
     
