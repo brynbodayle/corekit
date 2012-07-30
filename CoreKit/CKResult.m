@@ -79,6 +79,9 @@
         if (responseBody != nil && [responseBody length] > 0){
             
             NSMutableArray *parts = [NSMutableArray arrayWithArray:[_request.remotePath componentsSeparatedByString:@"/"]];
+            
+            NSLog(@"PARTS - %@", parts);
+            
             if([[parts lastObject] intValue] > 0)
                 [parts removeLastObject];
             
@@ -127,7 +130,7 @@
                 finalData = parsed;
             }
             
-            //        NSLog(@"**** FINAL DATA \n %@", finalData);
+                    NSLog(@"**** FINAL DATA \n %@", finalData);
             
             NSMutableArray *builtObjects = [NSMutableArray array];
                        
@@ -140,13 +143,17 @@
             }
             else if(parsed != nil && finalData != nil && [parsed isKindOfClass:[NSDictionary class]] && [finalData isKindOfClass:[NSDictionary class]] && ![parsed isEqualToDictionary:finalData]){
                 
-                [builtObjects addObject:[model build:finalData]];
+                id obj = [model build:finalData];
+                
+                if(obj != nil){
+                    [builtObjects addObject:obj];
+                }
             }
             else{
                 [builtObjects addObject:finalData];
             }
             
-            //        NSLog(@"**** BUILT OBJECTS \n %@", builtObjects);
+                    NSLog(@"**** BUILT OBJECTS \n %@", builtObjects);
                     
             if(builtObjects > 0){
                 
@@ -154,9 +161,7 @@
             }
             else if(finalData != nil)
                 self.objects = [finalData isKindOfClass:[NSArray class]] ? finalData : @[finalData];
-            
-            //[currentThreadContext.parentContext save:nil];
-            
+                        
             id errorHash = [parsed objectForKeyPath:_request.routerMap.errorKeyPath];
             NSLog(@"%@", errorHash);
             if(errorHash != nil && [errorHash isKindOfClass:[NSDictionary class]]){
