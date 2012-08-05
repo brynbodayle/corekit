@@ -85,12 +85,13 @@
             if([[parts lastObject] intValue] > 0)
                 [parts removeLastObject];
             
-            NSString *pathEntity = [parts lastObject];
+            Class model = _request.routerMap.model == 0 ? NSClassFromString([[[parts lastObject] singularForm] capitalizedString]) : _request.routerMap.model;
             
+            NSString *pathEntity = NSStringFromClass(model);
             NSString *entityName = [[pathEntity singularForm] lowercaseString];
-            NSString *pluralEntityName = [pathEntity lowercaseString];
-                        
-            Class model = _request.routerMap.model;
+            NSString *pluralEntityName = [[pathEntity pluralForm] lowercaseString];
+            
+            NSLog(@"model - %@ - %@", model, [[pathEntity singularForm] uppercaseString]);
                     
             if(_request.routerMap.isRelationshipMap){
                 
@@ -104,7 +105,7 @@
             }
                     
             id parsed = [[CKManager sharedManager] deserialize:responseBody];
-            //NSLog(@"**** PARSED \n %@", parsed);
+            NSLog(@"**** PARSED \n %@", parsed);
             
             if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
                 return;
@@ -112,7 +113,7 @@
             
             id finalData;
                     
-            //        NSLog(@"%@ - %@", entityName, pluralEntityName);
+            NSLog(@"entity name: %@ - pluralName: %@ responsePath: %@", entityName, pluralEntityName, _request.routerMap.responseKeyPath);
             
             if([parsed isKindOfClass:[NSDictionary class]]){
              
@@ -130,7 +131,7 @@
                 finalData = parsed;
             }
             
-                    NSLog(@"**** FINAL DATA \n %@", finalData);
+            NSLog(@"**** FINAL DATA \n %@", finalData);
             
             NSMutableArray *builtObjects = [NSMutableArray array];
                        
@@ -141,10 +142,12 @@
                     [builtObjects addObject:[model build:obj]];
                 }
             }
+            
             else if(parsed != nil && finalData != nil && [parsed isKindOfClass:[NSDictionary class]] && [finalData isKindOfClass:[NSDictionary class]] && ![parsed isEqualToDictionary:finalData]){
                 
                 id obj = [model build:finalData];
                 
+                NSLog(@" *** %@ built %@ object from data: %@", obj, model, finalData);
                 if(obj != nil){
                     [builtObjects addObject:obj];
                 }

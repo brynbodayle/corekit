@@ -72,6 +72,11 @@
         map.remotePath = $S(@"%@/%@", [self baseURL], [resourceName lowercaseString]);
     }
     
+    if(map.model == 0){
+        
+        map.model = [self class];
+    }
+    
     return map;
 }
 
@@ -100,6 +105,11 @@
     
     map.requestMethod = method;
     map.object = self;
+    
+    if(map.model == 0){
+        
+        map.model = [self class];
+    }
     
     return map;
 }
