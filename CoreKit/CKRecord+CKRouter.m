@@ -136,6 +136,9 @@
         
         map.remotePath = $S(@"%@/%@/%@", [[self class] baseURL], parentPath, relationship);
         map.localAttribute = relationship;
+        
+        NSRelationshipDescription *relationshipDesc = relationships[relationship];
+        map.model = NSClassFromString([[relationshipDesc destinationEntity] managedObjectClassName]);
     }
     
     return map;
