@@ -16,7 +16,6 @@
 
 
 static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
-static NSString * const FORM_FLE_INPUT = @"photo[image]";
 
 @implementation CKRequest
 
@@ -112,14 +111,14 @@ static NSString * const FORM_FLE_INPUT = @"photo[image]";
     }
 }
 
-- (void) addFile:(NSData *) fileData withName:(NSString *) name{
+- (void) addFile:(NSData *) fileData withName:(NSString *) name forKey:(NSString *) key{
     
     _hasFile = YES;
     
     _headers[@"Content-Type"] = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", BOUNDRY];
     NSMutableData *postData = [NSMutableData dataWithCapacity:[fileData length] + 512];
     [postData appendData:[[NSString stringWithFormat:@"--%@\r\n", BOUNDRY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n\r\n", FORM_FLE_INPUT,name] dataUsingEncoding:NSUTF8StringEncoding]];
+    [postData appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n\r\n", key,name] dataUsingEncoding:NSUTF8StringEncoding]];
     [postData appendData:fileData];
     [postData appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n", BOUNDRY] dataUsingEncoding:NSUTF8StringEncoding]];
         
