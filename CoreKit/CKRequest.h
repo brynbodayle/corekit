@@ -93,6 +93,7 @@ typedef enum CKRequestInterval {
 - (void) addParameters:(NSDictionary *) data;
 - (void) addHeaders:(NSDictionary *) data;
 - (void) send;
+- (void) cancel;
 - (CKResult *) sendSyncronously;
 - (void) addFile:(NSData *) fileData withName:(NSString *) name forKey:(NSString *) key;
 - (void) scheduleRepeatRequest;

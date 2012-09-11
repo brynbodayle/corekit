@@ -32,6 +32,13 @@
  */
 - (CKResult *) sendSyncronously:(CKRequest *) request;
 
+/**
+ Cancel request
+ 
+ */
+
+- (void) cancel;
+
 @optional
 /**
  Send a batched, asyncronous request.
@@ -48,6 +55,7 @@
 
 @required
 - (void) connection:(id <CKConnection>) connection didFinishWithResult:(CKResult *) result;
+- (void) connectionCancelled:(id <CKConnection>) connection;
 - (void) connection:(id <CKConnection>) connection didFailWithResult:(CKResult *) result;
 - (void) connection:(id <CKConnection>) connection didParseObject:(id) object;
 

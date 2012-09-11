@@ -234,6 +234,11 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     return _connection == nil ? [[[CKManager sharedManager].connectionClass alloc] init] : _connection;
 }
 
+- (void) cancel{
+	
+	[_connection cancel];
+}
+
 - (void) send{
     
     if(self.interval)
@@ -270,6 +275,11 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
 
 
 // delegate methods
+
+- (void) connectionCancelled:(id<CKConnection>)connection{
+	
+	// subclass
+}
 
 - (void) connection:(id<CKConnection>)connection didFailWithResult:(CKResult *)result{
     

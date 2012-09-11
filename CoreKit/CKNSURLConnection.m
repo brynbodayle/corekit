@@ -54,6 +54,12 @@
 	return connected;
 }
 
+- (void) cancel{
+	
+	[_connection cancel];
+	[_request connectionCancelled:self];
+}
+
 - (void) send:(CKRequest *) request{
     
     self.request = request;
