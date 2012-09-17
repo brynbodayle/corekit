@@ -56,8 +56,10 @@
 
 - (void) cancel{
 	
-	[_connection cancel];
+    [_connection cancel];
 	[_request connectionCancelled:self];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
 }
 
 - (void) send:(CKRequest *) request{
