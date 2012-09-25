@@ -10,11 +10,12 @@
 
 @interface CKCoreData : NSObject
 
-@property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, strong) NSManagedObjectContext *mainThreadManagedObjectContext;
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
 - (NSManagedObjectContext*) newManagedObjectContext:(NSManagedObjectContextConcurrencyType) concurrencyType;
+- (NSManagedObjectContext *) managedObjectContext;
 - (NSString *) storePath;
 - (NSURL *) storeURL;
 - (NSString *) persistentStoreType;

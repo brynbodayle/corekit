@@ -12,6 +12,12 @@
 #import "CKNSJSONSerialization.h"
 #import "CKRecord.h"
 
+@interface CKManager ()
+
+@property (nonatomic, assign) dispatch_queue_t networkQueue;
+
+@end
+
 
 @implementation CKManager
 
@@ -43,6 +49,7 @@
         _connectionClass = [CKNSURLConnection class];
         _serializationClass = [CKNSJSONSerialization class];
         _fixtureSerializationClass = [CKNSJSONSerialization class];
+		_networkQueue = dispatch_queue_create("com.corekit.network", 0);
     }
     
     return self;
@@ -114,7 +121,7 @@
         [self sendBatchRequest:request];
     
     else
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        dispatch_async(_networkQueue, ^{
             [request.connection send:request];
         });
 }

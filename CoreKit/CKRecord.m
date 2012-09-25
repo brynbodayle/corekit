@@ -120,7 +120,7 @@
                 
                 id __strong resource = [self findById:resourceId];
                 
-                NSMutableArray *__strong returnValue = resource == nil ? [self create:data] : [[resource threadedSafeSelf] update:data];
+                NSMutableArray *__strong returnValue = resource == nil ? [self create:data] : [resource update:data];
                 return returnValue;
             }
             else{
@@ -134,25 +134,14 @@
 }
 
 + (id) create:(id) data{
-    
-    __block id returnValue;
-    
-    [[self managedObjectContext] performBlockAndWait:^{
-       
-        returnValue = [[self blank] update:data];
-    }];
+               
+	id returnValue = [[self blank] update:data];
         
     return returnValue;
 }
 
 - (id) update:(NSDictionary *) data{
-    
-    __block id safe;
-    
-    [[self managedObjectContext] performBlockAndWait:^{
-        
-        safe = [self threadedSafeSelf];
-            
+                            
         [data enumerateKeysAndObjectsWithOptions:0 usingBlock:^(id key, id obj, BOOL *stop){
             
             NSString *localKey = [[CKRouter sharedRouter] localAttributeForRemoteKey:key forModel:[self class]];
@@ -161,11 +150,11 @@
             if(propertyDescription != nil){
                 
                 if([propertyDescription isKindOfClass:[NSRelationshipDescription class]])
-                    [safe setRelationship:localKey value:obj relationshipDescription:(NSRelationshipDescription *) propertyDescription];
+                    [self setRelationship:localKey value:obj relationshipDescription:(NSRelationshipDescription *) propertyDescription];
                 else if([propertyDescription isKindOfClass:[NSAttributeDescription class]]){
                     
                     NSAttributeDescription *attributeDescription = (NSAttributeDescription *) propertyDescription;
-                    [safe setProperty:localKey value:obj attributeType:[attributeDescription attributeType]];
+                    [self setProperty:localKey value:obj attributeType:[attributeDescription attributeType]];
                 }
             }
         }];
@@ -178,14 +167,13 @@
         [self didUpdateRecord:self withData:data];
         
         NSError *error = nil;
-        if(![safe validateForUpdate:&error]){
+        if(![self validateForUpdate:&error]){
             NSLog(@"%@", error);
         }
         
-        [[self managedObjectContext] refreshObject:safe mergeChanges:YES];
-    }];
+        [[self managedObjectContext] refreshObject:self mergeChanges:YES];
      
-    return safe;
+    return self;
 }
 
 + (void) updateWithPredicate:(NSPredicate *)predicate withData:(NSDictionary *)data{

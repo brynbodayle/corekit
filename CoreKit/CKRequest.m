@@ -285,10 +285,10 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_errorBlock != nil){
         
-        dispatch_async(_delegateThread, ^{
+        //dispatch_async(_delegateThread, ^{
                 
             _errorBlock(result);
-        });
+       // });
     }
 }
 
@@ -296,17 +296,17 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_completionBlock != nil && ![result isError]){
         
-        dispatch_async(_delegateThread, ^{
+        //dispatch_async(_delegateThread, ^{
             
             _completionBlock(result);
-        });
+        //});
     }
     else if(_errorBlock != nil && [result isError]){
         
-        dispatch_async(_delegateThread, ^{
+        //dispatch_async(_delegateThread, ^{
             
             _errorBlock(result);
-        });
+        //});
     }
 }
 
@@ -314,10 +314,10 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_parseBlock != nil){
         
-        dispatch_async(_delegateThread, ^{
+        //dispatch_async(_delegateThread, ^{
             
             _parseBlock(object);
-        });
+        //});
     }
 }
 
