@@ -86,7 +86,7 @@ typedef enum CKRecordOptions {
  */
 + (id) create:(id) data;
 
-/** Update an existing record
+/** Update an existing record
  @param data Key/values to update the record with
  */
 - (id) update:(NSDictionary *) data;

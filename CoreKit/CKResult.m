@@ -71,11 +71,13 @@
 - (void) setResponseBody:(NSData *)responseBody{
     
     _responseBody = responseBody;
-        
-    __block NSManagedObjectContext *currentThreadContext = [CKManager sharedManager].coreData.managedObjectContext;
-
-    [currentThreadContext performBlockAndWait:^{
-    
+	   
+	if([NSThread currentThread].isMainThread){
+		NSLog(@"*************** PARSING RESPONSE BODY ON MAIN THREAD *************");
+	}
+	
+	@autoreleasepool {
+		
         if (responseBody != nil && [responseBody length] > 0){
             
             NSMutableArray *parts = [NSMutableArray arrayWithArray:[_request.remotePath componentsSeparatedByString:@"/"]];
@@ -92,7 +94,7 @@
             NSString *pluralEntityName = [[pathEntity pluralForm] lowercaseString];
             
             NSLog(@"model - %@ - %@", model, [[pathEntity singularForm] uppercaseString]);
-                    
+			
             if(_request.routerMap.isRelationshipMap){
                 
                 NSEntityDescription *entity = [_request.routerMap.model entityDescription];
@@ -103,20 +105,20 @@
                     model = NSClassFromString(relationship.destinationEntity.managedObjectClassName);
                 }
             }
-                    
+			
             id parsed = [[CKManager sharedManager] deserialize:responseBody];
             NSLog(@"**** PARSED \n %@", parsed);
             
             if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
                 return;
-           
+			
             
             id finalData;
-                    
+			
             NSLog(@"entity name: %@ - pluralName: %@ responsePath: %@", entityName, pluralEntityName, _request.routerMap.responseKeyPath);
             
             if([parsed isKindOfClass:[NSDictionary class]]){
-             
+				
                 if([_request.routerMap.responseKeyPath length] > 0)
                     finalData = [parsed objectForKeyPath:_request.routerMap.responseKeyPath];
                 else if ([[parsed allKeys] containsObject:pluralEntityName])
@@ -134,12 +136,13 @@
             NSLog(@"**** FINAL DATA \n %@", finalData);
             
             NSMutableArray *builtObjects = [NSMutableArray array];
-                       
+			
             if(finalData != nil && [finalData isKindOfClass:[NSArray class]]){
                 
                 for(id obj in finalData){
                     
-                    [builtObjects addObject:[model build:obj]];
+					id built = [model build:obj];
+                    [builtObjects addObject:built];
                 }
             }
             
@@ -156,15 +159,15 @@
                 [builtObjects addObject:finalData];
             }
             
-                    NSLog(@"**** BUILT OBJECTS \n %@", builtObjects);
-                    
+			NSLog(@"**** BUILT OBJECTS \n %@", builtObjects);
+			
             if(builtObjects > 0){
                 
                 self.objects = builtObjects;
             }
             else if(finalData != nil)
                 self.objects = [finalData isKindOfClass:[NSArray class]] ? finalData : @[finalData];
-                        
+			
             id errorHash = [parsed objectForKeyPath:_request.routerMap.errorKeyPath];
             NSLog(@"%@", errorHash);
             if(errorHash != nil && [errorHash isKindOfClass:[NSDictionary class]]){
@@ -179,11 +182,13 @@
                     });
                 }
             }
+			
+			//[[CKManager sharedManager].coreData save];
         }
         else
             self.objects = @[];
         
-    }];
+	}
 }
 
 - (BOOL) isError{

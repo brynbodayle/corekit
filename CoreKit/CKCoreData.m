@@ -12,10 +12,6 @@
 
 @implementation CKCoreData
 
-@synthesize managedObjectContext = _managedObjectContext;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-
 #define ckCoreDataApplicationStorageType		NSSQLiteStoreType
 #define ckCoreDataTestingStorageType            NSInMemoryStoreType
 #define ckCoreDataStoreFileName                 @"CoreDataStore.sqlite"
@@ -27,13 +23,13 @@
     self = [super init];
     if (self) {
 
-        self.managedObjectContext = [self newManagedObjectContext:NSMainQueueConcurrencyType];
         self.managedObjectModel = [self managedObjectModel];
 		self.persistentStoreCoordinator = [self persistentStoreCoordinator];
+		self.mainThreadManagedObjectContext = [self newManagedObjectContext:NSMainQueueConcurrencyType];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             
-            [self setupModels];
+            //[self setupModels];
         });
     }
     
@@ -53,22 +49,23 @@
 
 - (NSManagedObjectContext *) managedObjectContext{
     
-    if ([NSThread isMainThread] && _managedObjectContext != nil)
-		return _managedObjectContext;
+    if ([NSThread isMainThread])
+		return _mainThreadManagedObjectContext;
     else{
 		
 		NSMutableDictionary *threadDictionary = [[NSThread currentThread] threadDictionary];
 		NSManagedObjectContext *backgroundThreadContext = threadDictionary[ckCoreDataThreadKey];
 		
-		if (!backgroundThreadContext && ![NSThread mainThread]) {
+		if (backgroundThreadContext == nil) {
 			
 			backgroundThreadContext = [self newManagedObjectContext:NSPrivateQueueConcurrencyType];
-            backgroundThreadContext.parentContext = _managedObjectContext;
+            backgroundThreadContext.parentContext = self.mainThreadManagedObjectContext;
 		}
-        else if(!backgroundThreadContext && [NSThread mainThread]){
-            
-            backgroundThreadContext = [self newManagedObjectContext:NSMainQueueConcurrencyType];
-        }
+		
+		[[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:backgroundThreadContext queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+			
+			[self.mainThreadManagedObjectContext mergeChangesFromContextDidSaveNotification:note];
+		}];
         
         threadDictionary[ckCoreDataThreadKey] = backgroundThreadContext;
         
@@ -84,6 +81,7 @@
         moc.persistentStoreCoordinator = [self persistentStoreCoordinator];
     
     moc.undoManager = nil;
+	moc.retainsRegisteredObjects = YES;
     moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
     
 	return moc;
@@ -169,6 +167,11 @@
     if(![self.managedObjectContext hasChanges])
         return YES;
     
+	if([NSThread currentThread].isMainThread){
+		
+		NSLog(@"***** CoreKit - SAVING ON MAIN THREAD *****");
+	}
+	
     int insertedObjectsCount = [[self.managedObjectContext insertedObjects] count];
 	int updatedObjectsCount = [[self.managedObjectContext updatedObjects] count];
 	int deletedObjectsCount = [[self.managedObjectContext deletedObjects] count];

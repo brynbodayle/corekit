@@ -138,9 +138,11 @@
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection{
 	
+	NSLog(@"CON FINISHED - MAIN THREAD ? %i", [NSThread currentThread].isMainThread);
+	
     _request.completed = YES;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
+	
     CKResult *result = [CKResult resultWithRequest:_request andResponseBody:_responseData];
     result.responseCode = _responseCode;
     result.responseHeaders = _responseHeaders;
