@@ -19,3 +19,4 @@
 #import "CKResult.h"
 #import "CKBindings.h"
 #import "CKRecord+CKBindings.h"
+#import "CKTableViewDataSource.h"

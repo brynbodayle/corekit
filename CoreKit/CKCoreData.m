@@ -61,11 +61,6 @@
 			backgroundThreadContext = [self newManagedObjectContext:NSPrivateQueueConcurrencyType];
             backgroundThreadContext.parentContext = self.mainThreadManagedObjectContext;
 		}
-		
-		[[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:backgroundThreadContext queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-			
-			[self.mainThreadManagedObjectContext mergeChangesFromContextDidSaveNotification:note];
-		}];
         
         threadDictionary[ckCoreDataThreadKey] = backgroundThreadContext;
         
@@ -75,14 +70,18 @@
 
 - (NSManagedObjectContext*) newManagedObjectContext:(NSManagedObjectContextConcurrencyType) concurrencyType{
 	
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:concurrencyType];
+	__block NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:concurrencyType];
     
     if(concurrencyType == NSMainQueueConcurrencyType)
         moc.persistentStoreCoordinator = [self persistentStoreCoordinator];
     
     moc.undoManager = nil;
-	moc.retainsRegisteredObjects = YES;
     moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+	
+	[[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:moc queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+		
+		[moc mergeChangesFromContextDidSaveNotification:note];
+	}];
     
 	return moc;
 }
@@ -166,11 +165,8 @@
     
     if(![self.managedObjectContext hasChanges])
         return YES;
-    
-	if([NSThread currentThread].isMainThread){
-		
-		NSLog(@"***** CoreKit - SAVING ON MAIN THREAD *****");
-	}
+	
+	[self.managedObjectContext lock];
 	
     int insertedObjectsCount = [[self.managedObjectContext insertedObjects] count];
 	int updatedObjectsCount = [[self.managedObjectContext updatedObjects] count];
@@ -198,7 +194,7 @@
         
     }
 	
-    NSLog(@"Created: %i, Updated: %i, Deleted: %i, Time: %f seconds", insertedObjectsCount, updatedObjectsCount, deletedObjectsCount, ([startTime timeIntervalSinceNow] *-1));
+    NSLog(@"Created: %i, Updated: %i, Deleted: %i, Time: %f seconds %@", insertedObjectsCount, updatedObjectsCount, deletedObjectsCount, ([startTime timeIntervalSinceNow] *-1), [NSThread currentThread].isMainThread ? @"(on main thread)" : @"");
     
     if(self.managedObjectContext.parentContext != nil){
         
@@ -207,6 +203,8 @@
             [self.managedObjectContext.parentContext save:nil];
         }];
     }
+	
+	[self.managedObjectContext unlock];
     
     return YES;
 }

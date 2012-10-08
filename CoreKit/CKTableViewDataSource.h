@@ -15,6 +15,8 @@
 @optional
 - (void) dataSourceDidLoad;
 - (void) dataSourceWillLoad;
+- (void) configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath withObject:(id) object;
+- (Class) classForObject:(id) object;
 
 @end
 
@@ -27,7 +29,7 @@
 @property (nonatomic, strong) id <CKTableViewDelegate> delegate;
 
 + (id) dataSourceForEntity:(NSString *) entity andTableView:(UITableView *) tableView;
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath withObject:(id) object;
 - (NSInteger) count;
+- (id) objectAtIndexPath:(NSIndexPath *) indexPath;
 
 @end
