@@ -24,7 +24,7 @@
 /* Begin PBXBuildFile section */
 		C9030A2F13D60A630024AE31 /* CKRecordTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C9030A2E13D60A630024AE31 /* CKRecordTests.m */; };
 		C9030A3B13D624A10024AE31 /* fixtures in Resources */ = {isa = PBXBuildFile; fileRef = C9030A3A13D624A10024AE31 /* fixtures */; };
-		C90A8CF61428F52F00FBDFAD /* CKTableViewDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = C90A8CF41428F52F00FBDFAD /* CKTableViewDataSource.h */; };
+		C90A8CF61428F52F00FBDFAD /* CKTableViewDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = C90A8CF41428F52F00FBDFAD /* CKTableViewDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C90A8CF71428F52F00FBDFAD /* CKTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = C90A8CF51428F52F00FBDFAD /* CKTableViewDataSource.m */; };
 		C90A8CF81428F52F00FBDFAD /* CKTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = C90A8CF51428F52F00FBDFAD /* CKTableViewDataSource.m */; };
 		C915059913E889A9004941A5 /* inflections.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9F05F3B13E7391700557828 /* inflections.plist */; };

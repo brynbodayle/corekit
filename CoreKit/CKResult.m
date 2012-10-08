@@ -183,7 +183,7 @@
                 }
             }
 			
-			//[[CKManager sharedManager].coreData save];
+			[[CKManager sharedManager].coreData save];
         }
         else
             self.objects = @[];

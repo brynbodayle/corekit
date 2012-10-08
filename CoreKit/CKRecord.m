@@ -756,7 +756,7 @@
 
 - (CKRecord *) threadedSafeSelf{
     
-    return (CKRecord *) [[CKManager sharedManager].coreData.managedObjectContext existingObjectWithID:[self objectID] error:nil];
+    return (CKRecord *) [[CKManager sharedManager].coreData objectWithURI:[[self objectID] URIRepresentation]];
 }
 
 #pragma mark -

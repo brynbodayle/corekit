@@ -29,6 +29,11 @@
     return dataSource;
 }
 
+- (id) objectAtIndexPath:(NSIndexPath *) indexPath
+{
+	return [self.fetchedResultsController objectAtIndexPath:indexPath];
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     
     return [[self.fetchedResultsController sections] count];
@@ -42,17 +47,23 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *CellIdentifier = @"Cell";
+	CKRecord *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	Class tableViewCellClass = _cellClass == nil ? [UITableViewCell class] : _cellClass;
+	
+	if(self.delegate != nil && [self.delegate respondsToSelector:@selector(configureCell:atIndexPath:withObject:)]){
+		
+		tableViewCellClass = [self.delegate classForObject:managedObject];
+	}
+	
+	NSString *CellIdentifier = NSStringFromClass(tableViewCellClass);
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (cell == nil) {
-        
-        Class tableViewCellClass = _cellClass == nil ? [UITableViewCell class] : _cellClass;
+		
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    CKRecord *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
     [self configureCell:cell atIndexPath:indexPath withObject:managedObject];
     
     return cell;
@@ -60,7 +71,10 @@
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath withObject:(id) object{
     
-    // Override
+    if(self.delegate != nil && [self.delegate respondsToSelector:@selector(configureCell:atIndexPath:withObject:)]){
+        
+        [self.delegate configureCell:cell atIndexPath:indexPath withObject:object];
+    }
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
