@@ -16,15 +16,18 @@
 @synthesize cellClass = _cellClass;
 @synthesize delegate = _delegate;
 
-+ (id) dataSourceForEntity:(NSString *) entity andTableView:(UITableView *) tableView{
++ (id) dataSourceForEntity:(NSString *) entity andTableView:(UITableView *) tableView andDelegate:(id <CKTableViewDelegate>) delegate{
     
     CKTableViewDataSource *dataSource = [[[self class] alloc] init];
-
+	dataSource.delegate = delegate;
+	
     dataSource.tableView = tableView;
     tableView.dataSource = dataSource;
     
     Class model = NSClassFromString(entity);
     dataSource.entityDescription = [model entityDescription];
+	
+	[dataSource fetchedResultsController];
     
     return dataSource;
 }
@@ -50,7 +53,7 @@
 	CKRecord *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	Class tableViewCellClass = _cellClass == nil ? [UITableViewCell class] : _cellClass;
 	
-	if(self.delegate != nil && [self.delegate respondsToSelector:@selector(configureCell:atIndexPath:withObject:)]){
+	if(self.delegate != nil && [self.delegate respondsToSelector:@selector(classForObject:)]){
 		
 		tableViewCellClass = [self.delegate classForObject:managedObject];
 	}
@@ -139,11 +142,20 @@
     if (_fetchedResultsController != nil) {
         return _fetchedResultsController;
     }
+	
+	NSFetchRequest *fetchRequest;
+	
+	if(_delegate != nil && [_delegate respondsToSelector:@selector(fetchRequest)])
+	{
+		fetchRequest = [_delegate fetchRequest];
+	}
+    else
+	{
+		Class model = NSClassFromString([_entityDescription managedObjectClassName]);
+		fetchRequest = [model fetchRequest];
+	}
     
-    Class model = NSClassFromString([_entityDescription managedObjectClassName]);
-    NSFetchRequest *fetchRequest = [model fetchRequest];
-    
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:[CKManager sharedManager].managedObjectContext sectionNameKeyPath:nil cacheName:_entityDescription.managedObjectClassName];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:[CKManager sharedManager].managedObjectContext sectionNameKeyPath:nil cacheName:nil];
     
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
