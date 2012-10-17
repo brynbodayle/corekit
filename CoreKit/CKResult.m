@@ -107,15 +107,11 @@
             }
 			
             id parsed = [[CKManager sharedManager] deserialize:responseBody];
-            NSLog(@"**** PARSED \n %@", parsed);
             
             if(![parsed isKindOfClass:[NSArray class]] && ![parsed isKindOfClass:[NSDictionary class]])
                 return;
-			
             
             id finalData;
-			
-            NSLog(@"entity name: %@ - pluralName: %@ responsePath: %@", entityName, pluralEntityName, _request.routerMap.responseKeyPath);
             
             if([parsed isKindOfClass:[NSDictionary class]]){
 				
@@ -133,7 +129,7 @@
                 finalData = parsed;
             }
             
-            NSLog(@"**** FINAL DATA \n %@", finalData);
+            //NSLog(@"**** FINAL DATA \n %@", finalData);
             
             NSMutableArray *builtObjects = [NSMutableArray array];
 			
@@ -150,7 +146,6 @@
                 
                 id obj = [model build:finalData];
                 
-                NSLog(@" *** %@ built %@ object from data: %@", obj, model, finalData);
                 if(obj != nil){
                     [builtObjects addObject:obj];
                 }
@@ -169,7 +164,6 @@
                 self.objects = [finalData isKindOfClass:[NSArray class]] ? finalData : @[finalData];
 			
             id errorHash = [parsed objectForKeyPath:_request.routerMap.errorKeyPath];
-            NSLog(@"%@", errorHash);
             if(errorHash != nil && [errorHash isKindOfClass:[NSDictionary class]]){
                 
                 //self.error = [NSError errorWithDomain:@"com.corekit" code:_responseCode userInfo:@{ NSLocalizedDescriptionKey : errorHash }];
@@ -187,7 +181,6 @@
         }
         else
             self.objects = @[];
-        
 	}
 }
 

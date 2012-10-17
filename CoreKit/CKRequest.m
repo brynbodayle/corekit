@@ -231,7 +231,14 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
 
 - (id) connection{
     
-    return _connection == nil ? [[[CKManager sharedManager].connectionClass alloc] init] : _connection;
+	if(_connection != nil)
+	{
+		return _connection;
+	}
+	
+	_connection = [[[CKManager sharedManager].connectionClass alloc] init];
+	
+	return _connection;
 }
 
 - (void) cancel{
@@ -285,10 +292,10 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_errorBlock != nil){
         
-        //dispatch_async(_delegateThread, ^{
+        dispatch_async(_delegateThread, ^{
                 
             _errorBlock(result);
-       // });
+       });
     }
 }
 
@@ -296,17 +303,17 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_completionBlock != nil && ![result isError]){
         
-        //dispatch_async(_delegateThread, ^{
+        dispatch_async(_delegateThread, ^{
             
             _completionBlock(result);
-        //});
+        });
     }
     else if(_errorBlock != nil && [result isError]){
         
-        //dispatch_async(_delegateThread, ^{
+        dispatch_async(_delegateThread, ^{
             
             _errorBlock(result);
-        //});
+        });
     }
 }
 
@@ -314,10 +321,10 @@ static NSString * const BOUNDRY = @"0xKhTmLbOuNdArY";
     
     if(_parseBlock != nil){
         
-        //dispatch_async(_delegateThread, ^{
+        dispatch_async(_delegateThread, ^{
             
             _parseBlock(object);
-        //});
+        });
     }
 }
 
