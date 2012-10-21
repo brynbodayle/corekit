@@ -82,6 +82,7 @@ typedef enum CKRequestInterval {
 @property (nonatomic, copy) CKParseBlock parseBlock;
 @property (nonatomic, strong) NSString *baseURL;
 @property (nonatomic, strong) id relationshipObject;
+@property (nonatomic, strong) NSDictionary *userInfo;
 
 + (CKRequest *) request;
 + (CKRequest *) requestWithRemotePath:(NSString *) remotePath;
